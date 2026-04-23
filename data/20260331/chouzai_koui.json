@@ -236,6 +236,60 @@
       "itemFormat": "固定"
     },
     {
+      "seq": 13,
+      "name": "きざみ値計算識別",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "きざみ値により計算を行う調剤行為であるか否かを表\nす。",
+      "_source": "text"
+    },
+    {
+      "seq": 14,
+      "name": "下限値",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定",
+      "description": "調剤数量の下限値を表す。\n下限値に制限がない場合は「０００」を設定する。",
+      "_source": "text"
+    },
+    {
+      "seq": 15,
+      "name": "上限値",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定",
+      "description": "調剤数量の上限値を表す。\n上限値に制限がない場合は「９９９」を設定する。",
+      "_source": "text"
+    },
+    {
+      "seq": 16,
+      "name": "きざみ値",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "項番１７「きざみ点数」を適用する単位を表す。",
+      "_source": "text"
+    },
+    {
+      "seq": 17,
+      "name": "きざみ点数",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "可変",
+      "description": "下２桁を小数点以下とする９桁の数字で設定する。",
+      "_source": "text"
+    },
+    {
+      "seq": 18,
+      "name": "上下限エラー処理",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "「０」を設定し、調剤数量と項番１４「下限値」及び項\n番１５「上限値」の値に応じた点数計算を行う。",
+      "_source": "text"
+    },
+    {
       "seq": 19,
       "name": "減算項目/減算行為区分",
       "shortName": "減算行為区分",
@@ -708,6 +762,29 @@
       "itemFormat": "固定"
     },
     {
+      "seq": 48,
+      "name": "上限回数エラー処",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "算定回数が上限回数を超えた場合の処理方法を表す。\n理\n０：算定回数を確認する。\n１：上限回数にて算定する。\n２：上限回数を確認する。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "算定回数を確認する。"
+        },
+        {
+          "code": "1",
+          "name": "上限回数にて算定する。"
+        },
+        {
+          "code": "2",
+          "name": "上限回数を確認する。"
+        }
+      ],
+      "_source": "text"
+    },
+    {
       "seq": 49,
       "name": "処方箋受付回単位/上限回数",
       "shortName": "上限回数",
@@ -743,6 +820,15 @@
       "itemFormat": "固定"
     },
     {
+      "seq": 50,
+      "name": "上限回数エラー処",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "当該調剤行為の算定回数が、上限回数を超えた場合の処\n理                           理を表す。",
+      "_source": "text"
+    },
+    {
       "seq": 51,
       "name": "注加算/コード",
       "shortName": "コード",
@@ -758,6 +844,15 @@
       "mode": "alphanumeric",
       "maxBytes": 1,
       "itemFormat": "固定"
+    },
+    {
+      "seq": 53,
+      "name": "下限年齢",
+      "mode": "alphanumeric",
+      "maxBytes": 2,
+      "itemFormat": "固定",
+      "description": "当該調剤行為を算定可能な年齢の下限値を表す。",
+      "_source": "text"
     },
     {
       "seq": 54,

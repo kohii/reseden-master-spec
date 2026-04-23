@@ -52,7 +52,7 @@
       "end": 27
     },
     "rawRecordCount": 38,
-    "fieldCount": 38
+    "fieldCount": 39
   },
   {
     "masterId": "comment",
@@ -63,7 +63,7 @@
       "end": 29
     },
     "rawRecordCount": 21,
-    "fieldCount": 28
+    "fieldCount": 30
   },
   {
     "masterId": "ika_shinryoukoui",
@@ -74,7 +74,7 @@
       "end": 53
     },
     "rawRecordCount": 138,
-    "fieldCount": 133
+    "fieldCount": 139
   },
   {
     "masterId": "shika_shinryoukoui",
@@ -85,7 +85,7 @@
       "end": 62
     },
     "rawRecordCount": 68,
-    "fieldCount": 57
+    "fieldCount": 69
   },
   {
     "masterId": "shika_shinryoukoui_イ",
@@ -96,7 +96,7 @@
       "end": 63
     },
     "rawRecordCount": 10,
-    "fieldCount": 7
+    "fieldCount": 10
   },
   {
     "masterId": "shika_shinryoukoui_ウ",
@@ -107,7 +107,7 @@
       "end": 64
     },
     "rawRecordCount": 10,
-    "fieldCount": 7
+    "fieldCount": 10
   },
   {
     "masterId": "shika_shinryoukoui_エ",
@@ -118,7 +118,7 @@
       "end": 65
     },
     "rawRecordCount": 10,
-    "fieldCount": 7
+    "fieldCount": 10
   },
   {
     "masterId": "shika_shinryoukoui_オ",
@@ -129,7 +129,7 @@
       "end": 66
     },
     "rawRecordCount": 10,
-    "fieldCount": 7
+    "fieldCount": 10
   },
   {
     "masterId": "shika_shinryoukoui_カ",
@@ -184,7 +184,7 @@
       "end": 76
     },
     "rawRecordCount": 12,
-    "fieldCount": 13
+    "fieldCount": 14
   },
   {
     "masterId": "chouzai_koui",
@@ -195,7 +195,7 @@
       "end": 83
     },
     "rawRecordCount": 49,
-    "fieldCount": 68
+    "fieldCount": 77
   },
   {
     "masterId": "houmon_kango",
@@ -206,6 +206,6 @@
       "end": 95
     },
     "rawRecordCount": 75,
-    "fieldCount": 106
+    "fieldCount": 118
   }
 ]

@@ -623,6 +623,60 @@
       ]
     },
     {
+      "seq": 30,
+      "name": "きざみ値計算識別",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "きざみ値により算定する診療行為であるか否かを表す。",
+      "_source": "text"
+    },
+    {
+      "seq": 31,
+      "name": "下限値",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "可変",
+      "description": "数量データの下限値を表す。\n下限値に制限がない場合は「０」を設定する。",
+      "_source": "text"
+    },
+    {
+      "seq": 32,
+      "name": "上限値",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "可変",
+      "description": "数量データの上限値を表す。\n上限値に制限がない場合は「９９９９９９９９」を設定す\nる。",
+      "_source": "text"
+    },
+    {
+      "seq": 33,
+      "name": "きざみ値",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "可変",
+      "description": "項番３４「きざみ点数」を適用する数量データの単位を表\nす。",
+      "_source": "text"
+    },
+    {
+      "seq": 34,
+      "name": "きざみ点数",
+      "mode": "numeric",
+      "maxBytes": 10,
+      "itemFormat": "可変",
+      "description": "整数部「７桁」、小数点「１桁」及び小数部「２桁」の組\nみ合わせで設定する。",
+      "_source": "text"
+    },
+    {
+      "seq": 35,
+      "name": "上下限エラー処理",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "当該診療行為の数量データが「下限値－きざみ値」以下又\nは「上限値」を超えた場合の処理を表す。\n上下限エラー処理は、下表の区分により「０」から「３」\nの値を設定する。",
+      "_source": "text"
+    },
+    {
       "seq": 36,
       "name": "上限回数/上限回数",
       "shortName": "上限回数",

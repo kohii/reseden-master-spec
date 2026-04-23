@@ -22,6 +22,8 @@ from typing import Any
 
 import pdfplumber
 
+import text_supplement
+
 # 全角数字→半角
 ZEN2HAN_DIGIT = str.maketrans("０１２３４５６７８９", "0123456789")
 # カタカナ「ﾓｰﾄﾞ」パターン等、ヘッダ検出用に正規化
@@ -660,10 +662,44 @@ def normalize_records(raw_records: list[dict[str, Any]]) -> list[dict[str, Any]]
 # ---------------------------------------------------------------------------
 
 
+def _detect_missing_seqs(fields: list[dict[str, Any]]) -> set[int]:
+    """連続する項番列の中で欠落している seq を返す。"""
+    seqs = sorted({f["seq"] for f in fields})
+    if not seqs:
+        return set()
+    return set(range(seqs[0], seqs[-1] + 1)) - set(seqs)
+
+
+def _to_field_entry(rec: dict[str, Any]) -> dict[str, Any]:
+    """text_supplement由来のrawレコードを medi-xplorer互換 field entry に変換する。"""
+    mode = MODE_MAP.get(rec["mode_raw"], rec["mode_raw"]) or None
+    mb_info = parse_max_bytes(rec["max_bytes_raw"])
+    content = rec.get("content", "")
+    codes = parse_codes(content)
+    entry: dict[str, Any] = {"seq": rec["seq"], "name": rec["name"]}
+    if mode:
+        entry["mode"] = mode
+    if "max_bytes" in mb_info:
+        entry["maxBytes"] = mb_info["max_bytes"]
+    if rec.get("item_format_raw"):
+        entry["itemFormat"] = rec["item_format_raw"]
+    if content:
+        entry["description"] = content
+    if codes:
+        entry["codes"] = codes
+    entry["_source"] = "text"
+    return entry
+
+
 def extract_master(
-    pdf: pdfplumber.PDF, section: MasterSection
+    pdf: pdfplumber.PDF,
+    section: MasterSection,
+    pdf_path: Path | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """セクション範囲内のテーブルを抽出し、rawと正規化結果を返す。"""
+    """セクション範囲内のテーブルを抽出し、rawと正規化結果を返す。
+
+    pdf_path が与えられた場合、pdfplumber で取りこぼした seq をpdftotext出力から補完する。
+    """
     raw: list[dict[str, Any]] = []
     if section.end_page is None:
         return raw, []
@@ -674,6 +710,19 @@ def extract_master(
             rec["_page"] = page_idx + 1
             raw.append(rec)
     normalized = normalize_records(raw)
+
+    # 欠落 seq を pdftotext で補完
+    if pdf_path is not None and normalized:
+        missing = _detect_missing_seqs(normalized)
+        if missing:
+            supplemental = text_supplement.supplement_from_text(
+                pdf_path, section.start_page, section.end_page, missing
+            )
+            for rec in supplemental:
+                normalized.append(_to_field_entry(rec))
+            # seq 順にソート (同seq内は _source が pdfplumber由来を先に)
+            normalized.sort(key=lambda f: (f["seq"], f.get("_source") == "text"))
+
     return raw, normalized
 
 
@@ -739,7 +788,7 @@ def main(argv: list[str] | None = None) -> int:
                 + ")",
                 file=sys.stderr,
             )
-            raw, normalized = extract_master(pdf, sec)
+            raw, normalized = extract_master(pdf, sec, pdf_path)
             master_file = out_dir / f"{sec.master_id}.json"
             master_data: dict[str, Any] = {
                 "masterId": sec.master_id,

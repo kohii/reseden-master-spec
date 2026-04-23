@@ -121,6 +121,24 @@
       "description": "パターンごとに重複しない番号を記録する。"
     },
     {
+      "seq": 6,
+      "name": "漢字有効桁数",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "項番７「漢字名称」の文字数を表す。",
+      "_source": "text"
+    },
+    {
+      "seq": 7,
+      "name": "漢字名称",
+      "mode": "text",
+      "maxBytes": 300,
+      "itemFormat": "可変",
+      "description": "漢字：１５０文字",
+      "_source": "text"
+    },
+    {
       "seq": 8,
       "name": "カナ有効桁数",
       "mode": "numeric",

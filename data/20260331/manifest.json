@@ -55,7 +55,7 @@
         "end": 27
       },
       "file": "tokutei_kizai.json",
-      "fieldCount": 38
+      "fieldCount": 39
     },
     {
       "masterId": "comment",
@@ -66,7 +66,7 @@
         "end": 29
       },
       "file": "comment.json",
-      "fieldCount": 28
+      "fieldCount": 30
     },
     {
       "masterId": "ika_shinryoukoui",
@@ -77,7 +77,7 @@
         "end": 53
       },
       "file": "ika_shinryoukoui.json",
-      "fieldCount": 133
+      "fieldCount": 139
     },
     {
       "masterId": "shika_shinryoukoui",
@@ -88,7 +88,7 @@
         "end": 62
       },
       "file": "shika_shinryoukoui.json",
-      "fieldCount": 57
+      "fieldCount": 69
     },
     {
       "masterId": "shika_shinryoukoui_イ",
@@ -99,7 +99,7 @@
         "end": 63
       },
       "file": "shika_shinryoukoui_イ.json",
-      "fieldCount": 7
+      "fieldCount": 10
     },
     {
       "masterId": "shika_shinryoukoui_ウ",
@@ -110,7 +110,7 @@
         "end": 64
       },
       "file": "shika_shinryoukoui_ウ.json",
-      "fieldCount": 7
+      "fieldCount": 10
     },
     {
       "masterId": "shika_shinryoukoui_エ",
@@ -121,7 +121,7 @@
         "end": 65
       },
       "file": "shika_shinryoukoui_エ.json",
-      "fieldCount": 7
+      "fieldCount": 10
     },
     {
       "masterId": "shika_shinryoukoui_オ",
@@ -132,7 +132,7 @@
         "end": 66
       },
       "file": "shika_shinryoukoui_オ.json",
-      "fieldCount": 7
+      "fieldCount": 10
     },
     {
       "masterId": "shika_shinryoukoui_カ",
@@ -187,7 +187,7 @@
         "end": 76
       },
       "file": "shika_shinryoukoui_コ.json",
-      "fieldCount": 13
+      "fieldCount": 14
     },
     {
       "masterId": "chouzai_koui",
@@ -198,7 +198,7 @@
         "end": 83
       },
       "file": "chouzai_koui.json",
-      "fieldCount": 68
+      "fieldCount": 77
     },
     {
       "masterId": "houmon_kango",
@@ -209,7 +209,7 @@
         "end": 95
       },
       "file": "houmon_kango.json",
-      "fieldCount": 106
+      "fieldCount": 118
     }
   ]
 }

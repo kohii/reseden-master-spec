@@ -122,6 +122,15 @@
       "itemFormat": "可変"
     },
     {
+      "seq": 11,
+      "name": "点数等識別",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "項番１２「点数等」に設定した点数等の種別を表す。",
+      "_source": "text"
+    },
+    {
       "seq": 12,
       "name": "点数等",
       "mode": "numeric",
@@ -566,6 +575,15 @@
       ]
     },
     {
+      "seq": 31,
+      "name": "検査等実施判断グルー",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変",
+      "description": "検査及び画像診断等の判断料又は診断料を算定できる診療\nプ区分                        行為のグループ区分を表す。",
+      "_source": "text"
+    },
+    {
       "seq": 32,
       "name": "逓減対象区分",
       "mode": "numeric",
@@ -683,6 +701,140 @@
           "name": "関連あり"
         }
       ]
+    },
+    {
+      "seq": 45,
+      "name": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変",
+      "description": "施設基準を要する診療行為であるか否かを表す。",
+      "_source": "text"
+    },
+    {
+      "seq": 46,
+      "name": "通則加算グループ",
+      "mode": "alphanumeric",
+      "maxBytes": 4,
+      "itemFormat": "固定",
+      "description": "基本・通則加算対応テーブルの参照先グループ番号を表\nす。",
+      "_source": "text"
+    },
+    {
+      "seq": 47,
+      "name": "基本加算グループ",
+      "mode": "alphanumeric",
+      "maxBytes": 4,
+      "itemFormat": "固定",
+      "description": "基本・基本加算対応テーブルの参照先グループ番号を表\nす。",
+      "_source": "text"
+    },
+    {
+      "seq": 48,
+      "name": "注加算グループ",
+      "mode": "alphanumeric",
+      "maxBytes": 4,
+      "itemFormat": "固定",
+      "description": "基本・注加算対応テーブルの参照先グループ番号を表す。",
+      "_source": "text"
+    },
+    {
+      "seq": 49,
+      "name": "手技・材料加算グルー",
+      "mode": "alphanumeric",
+      "maxBytes": 4,
+      "itemFormat": "固定",
+      "description": "手技・材料加算対応テーブルの参照先グループ番号を表\nプ                          す。",
+      "_source": "text"
+    },
+    {
+      "seq": 50,
+      "name": "算定回数限度テーブル",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "算定回数限度テーブルとの関連の有無を表す。\n関連識別\n０：関連なし\n１：関連あり",
+      "codes": [
+        {
+          "code": "0",
+          "name": "関連なし"
+        },
+        {
+          "code": "1",
+          "name": "関連あり"
+        }
+      ],
+      "_source": "text"
+    },
+    {
+      "seq": 51,
+      "name": "きざみテーブル関連識",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "きざみテーブルとの関連の有無を表す。\n別\n０：関連なし\n１：関連あり（診療行為数量データ１の記録が必要）\n２：関連あり（診療行為数量データ１、２の記録が必要）",
+      "codes": [
+        {
+          "code": "0",
+          "name": "関連なし"
+        },
+        {
+          "code": "1",
+          "name": "関連あり（診療行為数量データ１の記録が必要）"
+        },
+        {
+          "code": "2",
+          "name": "関連あり（診療行為数量データ１、２の記録が必要）"
+        }
+      ],
+      "_source": "text"
+    },
+    {
+      "seq": 52,
+      "name": "年齢制限テーブル関連",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "年齢制限テーブルとの関連の有無を表す。\n識別\n０：関連なし\n１：関連あり",
+      "codes": [
+        {
+          "code": "0",
+          "name": "関連なし"
+        },
+        {
+          "code": "1",
+          "name": "関連あり"
+        }
+      ],
+      "_source": "text"
+    },
+    {
+      "seq": 53,
+      "name": "併算定背反テーブル関",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "併算定背反テーブルとの関連の有無を表す。\n連識別\n０：関連なし\n１：関連あり",
+      "codes": [
+        {
+          "code": "0",
+          "name": "関連なし"
+        },
+        {
+          "code": "1",
+          "name": "関連あり"
+        }
+      ],
+      "_source": "text"
+    },
+    {
+      "seq": 54,
+      "name": "実日数テーブル関連識",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "実日数テーブルとの関連の有無を表す。\n別",
+      "_source": "text"
     },
     {
       "seq": 55,
