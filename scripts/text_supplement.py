@@ -138,3 +138,72 @@ def supplement_from_text(
     lines = pdftotext_pages(pdf_path, start, end)
     records = parse_text_rows(lines)
     return [r for r in records if r["seq"] in missing_seqs]
+
+
+# 範囲ヘッダ行: "100 年齢加算①～④  ５２  当該..." のようなパターン
+# サブ項目名＋モード＋バイト等が欠けていることが多いので、
+# 「項番 + 項目名 + (maxBytes) + (内容先頭)」のゆるいマッチに留める。
+# 全角/半角数字の両方をサポート。
+_RANGE_HEADER_RE = re.compile(
+    r"^\s*(?P<seq_start>[0-9０-９]+)\s+(?P<name>.+?[①-⑳]\s*[～〜~\-]\s*[①-⑳])"
+    r"(?:\s+(?P<max_bytes>[0-9０-９]+))?"
+)
+_RANGE_TILDE_RE = re.compile(r"^\s*[～〜~]\s*$")
+_RANGE_END_RE = re.compile(r"^\s*([0-9０-９]+)\s*$")
+
+
+def find_seq_ranges(pdf_path: Path, start: int, end: int) -> list[dict[str, Any]]:
+    """pdftotextから範囲表記ヘッダを検出し、(start_seq, end_seq, name, max_bytes) を返す。
+
+    例:
+        100 年齢加算①～④       ５２        当該診療行為...
+         ～
+        111
+    → {"start": 100, "end": 111, "name": "年齢加算①～④", "max_bytes": "52", "description": "..."}
+    """
+    lines = pdftotext_pages(pdf_path, start, end)
+    results: list[dict[str, Any]] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i].rstrip()
+        m = _RANGE_HEADER_RE.match(line)
+        if m:
+            # 続く行で 〜 と 終端項番 を探す
+            end_seq = None
+            description_lines: list[str] = []
+            # ヘッダ行の内容先頭部分（maxBytesの後）を description に取り込む
+            tail = line[m.end() :].strip()
+            if tail:
+                description_lines.append(tail)
+            j = i + 1
+            while j < len(lines) and j < i + 8:
+                nxt = lines[j].rstrip()
+                if _RANGE_TILDE_RE.match(nxt):
+                    j += 1
+                    continue
+                m2 = _RANGE_END_RE.match(nxt)
+                if m2:
+                    end_seq = int(_zh(m2.group(1)))
+                    j += 1
+                    break
+                # description 行として蓄積
+                if nxt.strip():
+                    description_lines.append(nxt.strip())
+                j += 1
+
+            if end_seq is not None:
+                start_seq = int(_zh(m.group("seq_start")))
+                mb = m.group("max_bytes")
+                results.append(
+                    {
+                        "start": start_seq,
+                        "end": end_seq,
+                        "name": m.group("name").strip(),
+                        "max_bytes": _zh(mb) if mb else "",
+                        "description": "\n".join(description_lines).strip(),
+                    }
+                )
+            i = j
+            continue
+        i += 1
+    return results

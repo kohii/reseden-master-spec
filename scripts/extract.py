@@ -679,6 +679,79 @@ def _detect_defective_seqs(fields: list[dict[str, Any]]) -> set[int]:
     return defective
 
 
+def _find_orphan_children(raw: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """孤立子行（seq空・sub_name複数） を返す"""
+    return [
+        rec
+        for rec in raw
+        if not rec["seq_raw"].strip() and rec["sub_name"].strip()
+    ]
+
+
+def _recover_ranged_fields(
+    raw: list[dict[str, Any]],
+    ranges: list[dict[str, Any]],
+    defective_seqs: set[int],
+) -> list[dict[str, Any]]:
+    """範囲ヘッダ + 孤立子行 から N×M 展開された field entries を生成する。"""
+    produced: list[dict[str, Any]] = []
+    for rng in ranges:
+        span_seqs = set(range(rng["start"], rng["end"] + 1))
+        if not span_seqs.issubset(defective_seqs):
+            continue
+        # 範囲ヘッダから ①〜④ などのラベルを拾い、繰返し回数を決定
+        n_total = rng["end"] - rng["start"] + 1
+        children = _find_orphan_children(raw)
+        best_child = None
+        for child in children:
+            sub_count = len(_split_lines(child["sub_name"]))
+            if sub_count > 0 and n_total % sub_count == 0:
+                # repeat 回数とラベル数が一致すれば採用
+                repeat = n_total // sub_count
+                lbs = _extract_group_labels(rng["name"], repeat)
+                if lbs:
+                    best_child = (child, sub_count, repeat, lbs)
+                    break
+        if best_child is None:
+            continue
+        child, k, repeat, labels = best_child
+        sub_names = _split_lines(child["sub_name"])
+        modes = _normalize_mode_lines(_split_lines(child["mode_raw"]))
+        bytes_list = _split_lines(child["max_bytes_raw"])
+        formats = _split_lines(child["item_format_raw"])
+        base_name = _strip_group_label_notation(rng["name"])
+        content = child["content"] or rng.get("description", "")
+        for r in range(repeat):
+            label = labels[r] if r < len(labels) else ""
+            group_name = base_name + label
+            for s in range(k):
+                seq_val = rng["start"] + r * k + s
+                entry: dict[str, Any] = {
+                    "seq": seq_val,
+                    "name": f"{group_name}/{_pick_or_last(sub_names, s)}"
+                    if sub_names
+                    else group_name,
+                    "shortName": _pick_or_last(sub_names, s) or None,
+                }
+                if entry["shortName"] is None:
+                    entry.pop("shortName")
+                mode_lookup = _pick_or_last(modes, s)
+                mode = MODE_MAP.get(mode_lookup, mode_lookup) or None
+                if mode:
+                    entry["mode"] = mode
+                mb = parse_max_bytes(_pick_or_last(bytes_list, s))
+                if "max_bytes" in mb:
+                    entry["maxBytes"] = mb["max_bytes"]
+                fmt = _pick_or_last(formats, s)
+                if fmt:
+                    entry["itemFormat"] = fmt
+                if r == 0 and s == 0 and content:
+                    entry["description"] = content
+                entry["_source"] = "range+text"
+                produced.append(entry)
+    return produced
+
+
 def _to_field_entry(rec: dict[str, Any]) -> dict[str, Any]:
     """text_supplement由来のrawレコードを medi-xplorer互換 field entry に変換する。"""
     mode = MODE_MAP.get(rec["mode_raw"], rec["mode_raw"]) or None
@@ -724,6 +797,16 @@ def extract_master(
     if pdf_path is not None and normalized:
         defective = _detect_defective_seqs(normalized)
         if defective:
+            # まず、範囲表記ヘッダ + 孤立子行 のマージで N×M 展開を試す
+            ranges = text_supplement.find_seq_ranges(
+                pdf_path, section.start_page, section.end_page
+            )
+            range_recovered = _recover_ranged_fields(raw, ranges, defective)
+            if range_recovered:
+                normalized.extend(range_recovered)
+                recovered_seqs = {f["seq"] for f in range_recovered}
+                defective -= recovered_seqs
+
             supplemental = text_supplement.supplement_from_text(
                 pdf_path, section.start_page, section.end_page, defective
             )
@@ -736,7 +819,7 @@ def extract_master(
                 for rec in supplemental:
                     normalized.append(_to_field_entry(rec))
         # seq 順にソート (同seq内は pdfplumber由来を先に)
-        normalized.sort(key=lambda f: (f["seq"], f.get("_source") == "text"))
+        normalized.sort(key=lambda f: (f["seq"], f.get("_source") != "pdfplumber"))
 
     return raw, normalized
 
