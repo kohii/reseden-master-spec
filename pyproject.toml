@@ -1,0 +1,8 @@
+[project]
+name = "kihon-master-spec"
+version = "0.1.0"
+description = "診療報酬制度 基本マスターファイル仕様書PDFを構造化JSONに変換するツール"
+requires-python = ">=3.14"
+dependencies = [
+    "pdfplumber>=0.11.9",
+]

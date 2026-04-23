@@ -1,0 +1,111 @@
+{
+  "masterId": "shishiki",
+  "masterName": "歯式マスター",
+  "subName": null,
+  "version": "20260331",
+  "pages": {
+    "start": 18,
+    "end": 19
+  },
+  "fields": [
+    {
+      "seq": 1,
+      "name": "変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "マスター内容の異動状況を表す。\n０：前マスターの内容と同じであることを表す。\n１：抹消\n２：復活\n３：新規\n５：変更\n９：廃止\n「９：廃止」は、当該コードが使用できなくなったことを表\nす。\n次回のマスター更新時に、当該コードを削除する。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "前マスターの内容と同じであることを表す。"
+        },
+        {
+          "code": "1",
+          "name": "抹消"
+        },
+        {
+          "code": "2",
+          "name": "復活"
+        },
+        {
+          "code": "3",
+          "name": "新規"
+        },
+        {
+          "code": "5",
+          "name": "変更"
+        },
+        {
+          "code": "9",
+          "name": "廃止"
+        }
+      ]
+    },
+    {
+      "seq": 2,
+      "name": "マスター種別",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "「Ｆ」を設定する。\n（歯式マスターであることを表す。）"
+    },
+    {
+      "seq": 3,
+      "name": "歯式コード/歯種",
+      "shortName": "歯種",
+      "mode": "alphanumeric",
+      "maxBytes": 4,
+      "itemFormat": "固定",
+      "description": "歯種、状態及び部分の組み合わせによる歯式ごとに重複しな\nい番号を設定する。\n歯の種別を表す。\n歯種コードは、「別紙３－１」のとおりである。\n歯の状態を表す。\n状態コードは、「別紙３－２」のとおりである。\n歯の部分を表す。\n部分コードは、「別紙３－２」のとおりである。"
+    },
+    {
+      "seq": 3,
+      "name": "歯式コード/状態",
+      "shortName": "状態",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 3,
+      "name": "歯式コード/部分",
+      "shortName": "部分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 4,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 5,
+      "name": "歯式名称",
+      "mode": "text",
+      "maxBytes": 100,
+      "itemFormat": "可変",
+      "description": "漢字：５０文字"
+    },
+    {
+      "seq": 6,
+      "name": "変更年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該歯式の情報に変更等が生じた場合、適用となる日付を\n西暦年「４桁」、月「２桁」及び日「２桁」の８桁で表す。"
+    },
+    {
+      "seq": 7,
+      "name": "廃止年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該歯式の使用が可能な最終日付を西暦年「４桁」、月「２\n桁」及び日「２桁」の８桁で表す。\nなお、廃止した歯式コード以外は「９９９９９９９９」を設\n定する。"
+    }
+  ]
+}

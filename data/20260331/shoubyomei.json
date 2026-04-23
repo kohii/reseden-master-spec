@@ -1,0 +1,549 @@
+{
+  "masterId": "shoubyomei",
+  "masterName": "傷病名マスター",
+  "subName": null,
+  "version": "20260331",
+  "pages": {
+    "start": 11,
+    "end": 15
+  },
+  "fields": [
+    {
+      "seq": 1,
+      "name": "変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "マスター内容の異動状況を表す。\n０：前マスターの内容と同じであることを表す。\n１：抹消\n２：復活\n３：新規\n５：変更\n９：廃止\n「９：廃止」は、当該コードが旧傷病名管理ファイ\nルに移行したことを表す。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "前マスターの内容と同じであることを表す。"
+        },
+        {
+          "code": "1",
+          "name": "抹消"
+        },
+        {
+          "code": "2",
+          "name": "復活"
+        },
+        {
+          "code": "3",
+          "name": "新規"
+        },
+        {
+          "code": "5",
+          "name": "変更"
+        },
+        {
+          "code": "9",
+          "name": "廃止"
+        }
+      ]
+    },
+    {
+      "seq": 2,
+      "name": "マスター種別",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "「Ｂ」を設定する。\n（傷病名マスターであることを表す。）"
+    },
+    {
+      "seq": 3,
+      "name": "傷病名コード",
+      "mode": "numeric",
+      "maxBytes": 7,
+      "itemFormat": "固定",
+      "description": "傷病名ごとに重複しない番号を設定する。\n「ＩＣＤ１０対応標準病名マスター」における「病\n名基本テーブル」の「レセ電算コード」項目と同一内\n容である。",
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 4,
+      "name": "移行先コード",
+      "mode": "numeric",
+      "maxBytes": 7,
+      "itemFormat": "固定",
+      "description": "傷病名コードの廃止に伴い、傷病名コードの移行先\nがある場合に、移行先の傷病名コードを表す。\n傷病名コードの廃止に伴う異動情報の取扱いは「別\n紙１－２」のとおりである。"
+    },
+    {
+      "seq": 5,
+      "name": "傷病名称/傷病名基本名称桁数",
+      "shortName": "傷病名基本名称桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変",
+      "description": "項番６「傷病名基本名称」の文字数を表す。\n漢字：３０文字\n「ＩＣＤ１０対応標準病名マスター」における「病\n名基本テーブル」の「病名表記」項目と同一内容であ\nる。\n項番８「傷病名省略名称」の文字数を表す。\n漢字：２０文字\n傷病名基本名称のうち２０文字を超える傷病名を、\n省略して表記する。\n出力紙レセプト等に出力する名称（省略名称）を設\n定する。\n項番１０「傷病名カナ名称」の文字数を表す。\n全角英数カナ：５０文字\n項番６「傷病名基本名称」のカナ名称を表す。\n「ＩＣＤ１０対応標準病名マスター」における「病\n名基本テーブル」の「病名表記カナ」項目と同一内容\nである。",
+      "flags": {
+        "共通区分※注2": "○\n○\n○"
+      }
+    },
+    {
+      "seq": 6,
+      "name": "傷病名称/傷病名基本名称",
+      "shortName": "傷病名基本名称",
+      "mode": "text",
+      "maxBytes": 60,
+      "itemFormat": "可変",
+      "flags": {
+        "共通区分※注2": "○\n○\n○"
+      }
+    },
+    {
+      "seq": 7,
+      "name": "傷病名称/傷病名省略名称桁数",
+      "shortName": "傷病名省略名称桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変",
+      "flags": {
+        "共通区分※注2": "○\n○\n○"
+      }
+    },
+    {
+      "seq": 8,
+      "name": "傷病名称/傷病名省略名称※注３",
+      "shortName": "傷病名省略名称※注３",
+      "mode": "text",
+      "maxBytes": 40,
+      "itemFormat": "可変",
+      "flags": {
+        "共通区分※注2": "○\n○\n○"
+      }
+    },
+    {
+      "seq": 9,
+      "name": "傷病名称/傷病名カナ名称桁数",
+      "shortName": "傷病名カナ名称桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変",
+      "flags": {
+        "共通区分※注2": "○\n○\n○"
+      }
+    },
+    {
+      "seq": 10,
+      "name": "傷病名称/傷病名カナ名称",
+      "shortName": "傷病名カナ名称",
+      "mode": "alphanumeric",
+      "maxBytes": 100,
+      "itemFormat": "可変",
+      "flags": {
+        "共通区分※注2": "○\n○\n○"
+      }
+    },
+    {
+      "seq": 11,
+      "name": "病名管理番号",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "「ＩＣＤ１０対応標準病名マスター」の「病名基本\nテーブル」の収載項目と同一内容である。",
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 12,
+      "name": "採択区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 13,
+      "name": "病名交換用コード",
+      "mode": "alphanumeric",
+      "maxBytes": 4,
+      "itemFormat": "固定",
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 14,
+      "name": "予備",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "可変",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 15,
+      "name": "予備",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "可変",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 16,
+      "name": "ＩＣＤ－１０－１（２０１３）※注４",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "可変",
+      "description": "基礎疾患のＩＣＤ－１０（２０１３）分類番号を表\nす。\n「ＩＣＤ１０対応標準病名マスター」における「病\n名基本テーブル」の「ＩＣＤ１０－２０１３」項目と\n同一内容である。",
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 17,
+      "name": "ＩＣＤ－１０－２（２０１３）※注４",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "可変",
+      "description": "症状発現のＩＣＤ－１０（２０１３）分類番号を表\nす。\n「ＩＣＤ１０対応標準病名マスター」における「病\n名基本テーブル」の「ＩＣＤ１０－２０１３複数分類\nコード」項目と同一内容である。",
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 18,
+      "name": "予備",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "可変",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 19,
+      "name": "単独使用禁止区分",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定",
+      "description": "当該傷病名を単独で記録することを禁止する傷病名\nであることを表す。\n００：部位等修飾語との組み合わせが必須の傷病名\n以外\n０１：部位等修飾語との組み合わせが必須の傷病名",
+      "codes": [
+        {
+          "code": "00",
+          "name": "部位等修飾語との組み合わせが必須の傷病名以外"
+        },
+        {
+          "code": "01",
+          "name": "部位等修飾語との組み合わせが必須の傷病名"
+        }
+      ],
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 20,
+      "name": "保険請求外区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "保険請求の対象外となる傷病名であることを表す。\n０：保険請求対象外の傷病名以外\n１：保険請求対象外の傷病名",
+      "codes": [
+        {
+          "code": "0",
+          "name": "保険請求対象外の傷病名以外"
+        },
+        {
+          "code": "1",
+          "name": "保険請求対象外の傷病名"
+        }
+      ],
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 21,
+      "name": "特定疾患等対象区分",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定",
+      "description": "特定疾患療養管理料等の算定対象となる傷病名であ\nるか否かを表す。\n００：算定対象外\n０３：皮膚科特定疾患指導管理料（Ⅰ）算定対象\n０４：皮膚科特定疾患指導管理料（Ⅱ）算定対象\n０５：特定疾患療養管理料算定対象\n０７：てんかん指導料算定対象\n０８：特定疾患療養管理料又はてんかん指導料算定\n対象",
+      "codes": [
+        {
+          "code": "00",
+          "name": "算定対象外"
+        },
+        {
+          "code": "03",
+          "name": "皮膚科特定疾患指導管理料（Ⅰ）算定対象"
+        },
+        {
+          "code": "04",
+          "name": "皮膚科特定疾患指導管理料（Ⅱ）算定対象"
+        },
+        {
+          "code": "05",
+          "name": "特定疾患療養管理料算定対象"
+        },
+        {
+          "code": "07",
+          "name": "てんかん指導料算定対象"
+        },
+        {
+          "code": "08",
+          "name": "特定疾患療養管理料又はてんかん指導料算定"
+        }
+      ]
+    },
+    {
+      "seq": 22,
+      "name": "収載年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該傷病名を基本マスターに収載した日付を西暦年\n「４桁」、月「２桁」及び日「２桁」の８桁で表す。\nなお、収載年月日は、「２００２０６０１（平成１\n４年６月１日）」以降に収載した傷病名に設定してい\nる。"
+    },
+    {
+      "seq": 23,
+      "name": "変更年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該傷病名の情報に変更等が生じた場合、適用とな\nる日付を西暦年「４桁」、月「２桁」及び日「２桁」\nの８桁で表す。"
+    },
+    {
+      "seq": 24,
+      "name": "廃止年月日※注５",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該傷病名の使用が可能な最終日付を西暦年「４\n桁」、月「２桁」及び日「２桁」の８桁で表す。\nなお、廃止した傷病名コード以外は「９９９９９９\n９９」を設定する。"
+    },
+    {
+      "seq": 25,
+      "name": "傷病名基本名称（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "該当項目の変更有無を表す。\n０：当該項目の内容に変更なし\n１：当該項目の内容に変更あり",
+      "codes": [
+        {
+          "code": "0",
+          "name": "当該項目の内容に変更なし"
+        },
+        {
+          "code": "1",
+          "name": "当該項目の内容に変更あり"
+        }
+      ]
+    },
+    {
+      "seq": 26,
+      "name": "傷病名省略名称（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 27,
+      "name": "傷病名カナ名称（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 28,
+      "name": "採択区分（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 29,
+      "name": "病名交換用コード（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 30,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "未使用：「０」を設定する。"
+    },
+    {
+      "seq": 31,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 32,
+      "name": "歯科傷病名省略名称（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "該当項目の変更有無を表す。\n０：当該項目の内容に変更なし\n１：当該項目の内容に変更あり",
+      "codes": [
+        {
+          "code": "0",
+          "name": "当該項目の内容に変更なし"
+        },
+        {
+          "code": "1",
+          "name": "当該項目の内容に変更あり"
+        }
+      ]
+    },
+    {
+      "seq": 33,
+      "name": "難病外来対象区分（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 34,
+      "name": "歯科特定疾患対象区分（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 35,
+      "name": "単独使用禁止区分（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 36,
+      "name": "保険請求外区分（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 37,
+      "name": "特定疾患等対象区分（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 38,
+      "name": "移行先病名管理番号",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "廃止した傷病名に移行先の傷病名がある場合、移行\n先の病名管理番号を表す。",
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 39,
+      "name": "歯科傷病名省略名称※注６",
+      "mode": "text",
+      "maxBytes": 40,
+      "itemFormat": "可変",
+      "description": "歯科レセプトに使用できる歯科領域の傷病名の略称\nを表す。\n「標準歯科病名マスター」における「歯科病名基本\nテーブル」の「レセプト表記略称名」項目と同一内容\nである。",
+      "flags": {
+        "共通区分※注2": "○"
+      }
+    },
+    {
+      "seq": 40,
+      "name": "予備",
+      "mode": "alphanumeric",
+      "maxBytes": 10,
+      "itemFormat": "可変",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 41,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 42,
+      "name": "歯科傷病名省略名称桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変",
+      "description": "項番３９「歯科傷病名省略名称」の文字数を表す。"
+    },
+    {
+      "seq": 43,
+      "name": "難病外来対象区分",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定",
+      "description": "難病外来指導管理料の算定対象となる傷病名か否か\nを表す。\n００：算定対象外\n０９：難病外来指導管理料算定対象",
+      "codes": [
+        {
+          "code": "00",
+          "name": "算定対象外"
+        },
+        {
+          "code": "09",
+          "name": "難病外来指導管理料算定対象"
+        }
+      ]
+    },
+    {
+      "seq": 44,
+      "name": "歯科特定疾患対象区分",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定",
+      "description": "歯科特定疾患療養管理料の算定対象となる傷病名か\n否かを表す。\n００：算定対象外\n１０：歯科特定疾患療養管理料算定対象",
+      "codes": [
+        {
+          "code": "00",
+          "name": "算定対象外"
+        },
+        {
+          "code": "10",
+          "name": "歯科特定疾患療養管理料算定対象"
+        }
+      ]
+    },
+    {
+      "seq": 45,
+      "name": "ＩＣＤ－１０－１（２０１３）（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "該当項目の変更有無を表す。\n０：当該項目の内容に変更なし\n１：当該項目の内容に変更あり",
+      "codes": [
+        {
+          "code": "0",
+          "name": "当該項目の内容に変更なし"
+        },
+        {
+          "code": "1",
+          "name": "当該項目の内容に変更あり"
+        }
+      ]
+    },
+    {
+      "seq": 46,
+      "name": "ＩＣＤ－１０－２（２０１３）（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "該当項目の変更有無を表す。\n０：当該項目の内容に変更なし\n１：当該項目の内容に変更あり",
+      "codes": [
+        {
+          "code": "0",
+          "name": "当該項目の内容に変更なし"
+        },
+        {
+          "code": "1",
+          "name": "当該項目の内容に変更あり"
+        }
+      ]
+    }
+  ]
+}

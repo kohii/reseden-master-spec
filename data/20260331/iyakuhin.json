@@ -1,0 +1,571 @@
+{
+  "masterId": "iyakuhin",
+  "masterName": "医薬品マスター",
+  "subName": null,
+  "version": "20260331",
+  "pages": {
+    "start": 20,
+    "end": 23
+  },
+  "fields": [
+    {
+      "seq": 1,
+      "name": "変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "マスター内容の異動状況を表す。\n０：前マスターの内容と同じであることを表す。\n１：抹消\n３：新規\n５：変更\n９：廃止\n「９：廃止」は、当該コードが使用できなくなったことを\n表す。\n次回のマスター更新時に、当該コードを削除する。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "前マスターの内容と同じであることを表す。"
+        },
+        {
+          "code": "1",
+          "name": "抹消"
+        },
+        {
+          "code": "3",
+          "name": "新規"
+        },
+        {
+          "code": "5",
+          "name": "変更"
+        },
+        {
+          "code": "9",
+          "name": "廃止"
+        }
+      ]
+    },
+    {
+      "seq": 2,
+      "name": "マスター種別",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "「Ｙ」を設定する。\n（医薬品マスターであることを表す。）"
+    },
+    {
+      "seq": 3,
+      "name": "医薬品コード/区分",
+      "shortName": "区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "医薬品コードを表す「６」を設定する。\n医薬品ごとに重複しない番号を設定する。"
+    },
+    {
+      "seq": 3,
+      "name": "医薬品コード/番号",
+      "shortName": "番号",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 4,
+      "name": "医薬品名・規格名/漢字有効桁数",
+      "shortName": "漢字有効桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変",
+      "description": "医薬品名と規格名を組み合わせた名称を設定する。\n項番５「漢字名称」の文字数を表す。\n漢字：３２文字\n医薬品名と規格名を組み合わせた名称が３２文字を超える\n場合は、省略した名称を表す。\n項番７「カナ名称」の文字数を表す。\n半角英数カナ：２０文字\n項番５「漢字名称」のカナ名称を表す。"
+    },
+    {
+      "seq": 5,
+      "name": "医薬品名・規格名/漢字名称",
+      "shortName": "漢字名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 6,
+      "name": "医薬品名・規格名/カナ有効桁数",
+      "shortName": "カナ有効桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 7,
+      "name": "医薬品名・規格名/カナ名称",
+      "shortName": "カナ名称",
+      "mode": "alphanumeric",
+      "maxBytes": 20,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 8,
+      "name": "単位/コード",
+      "shortName": "コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "単位コードは「別紙４－１」のとおりである。\n単位が設定されていない場合は「０」を設定する。\n項番１０「漢字名称」の文字数を表す。\n未使用の場合：「０」を設定する。\n漢字：６文字\n未使用の場合：省略"
+    },
+    {
+      "seq": 9,
+      "name": "単位/漢字有効桁数",
+      "shortName": "漢字有効桁数",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 10,
+      "name": "単位/漢字名称",
+      "shortName": "漢字名称",
+      "mode": "text",
+      "maxBytes": 12,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 11,
+      "name": "新又は現金額/金額種別",
+      "shortName": "金額種別",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "項番１２「新又は現金額」に設定した金額等の種別を表\nす。\n１：金額\n３：薬剤使用量省略（歯科に限る。）\n７：減点\n金額種別の詳細は「別紙４－２」のとおりである。",
+      "codes": [
+        {
+          "code": "1",
+          "name": "金額"
+        },
+        {
+          "code": "3",
+          "name": "薬剤使用量省略（歯科に限る。）"
+        },
+        {
+          "code": "7",
+          "name": "減点"
+        }
+      ]
+    },
+    {
+      "seq": 12,
+      "name": "新又は現金額",
+      "mode": "numeric",
+      "maxBytes": 13,
+      "itemFormat": "可変",
+      "description": "整数部「１０桁」、小数点「１桁」及び小数部「２桁」の\n組み合わせで設定する。\nなお、医薬品は所定単位の投与量から点数を計算するた\nめ、医薬品の規格単位を最小単位にした金額を設定する。"
+    },
+    {
+      "seq": 13,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変",
+      "description": "未使用：「０」を設定する。"
+    },
+    {
+      "seq": 14,
+      "name": "麻薬・毒薬・覚醒剤原料・向精神薬",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "麻薬、毒薬、覚醒剤原料又は向精神薬に係る対象医薬品で\nあるか否かを表す。\n０：「１」から「５」以外の医薬品\n１：麻薬\n２：毒薬\n３：覚醒剤原料\n５：向精神薬",
+      "codes": [
+        {
+          "code": "0",
+          "name": "「１」から「５」以外の医薬品"
+        },
+        {
+          "code": "1",
+          "name": "麻薬"
+        },
+        {
+          "code": "2",
+          "name": "毒薬"
+        },
+        {
+          "code": "3",
+          "name": "覚醒剤原料"
+        },
+        {
+          "code": "5",
+          "name": "向精神薬"
+        }
+      ]
+    },
+    {
+      "seq": 15,
+      "name": "神経破壊剤",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "神経破壊剤に係る対象医薬品であるか否かを表す。\n０：神経破壊剤以外\n１：神経破壊剤",
+      "codes": [
+        {
+          "code": "0",
+          "name": "神経破壊剤以外"
+        },
+        {
+          "code": "1",
+          "name": "神経破壊剤"
+        }
+      ]
+    },
+    {
+      "seq": 16,
+      "name": "生物学的製剤",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "生物学的製剤加算に係る対象品目の医薬品であるか否かを\n表す。\n０：生物学的製剤加算対象品目以外\n１：生物学的製剤加算対象品目",
+      "codes": [
+        {
+          "code": "0",
+          "name": "生物学的製剤加算対象品目以外"
+        },
+        {
+          "code": "1",
+          "name": "生物学的製剤加算対象品目"
+        }
+      ]
+    },
+    {
+      "seq": 17,
+      "name": "後発品",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "医科点数表等に規定する加算等の算定対象となる後発医薬\n品であるか否かを表す。\n０：後発医薬品以外\n１：後発医薬品",
+      "codes": [
+        {
+          "code": "0",
+          "name": "後発医薬品以外"
+        },
+        {
+          "code": "1",
+          "name": "後発医薬品"
+        }
+      ]
+    },
+    {
+      "seq": 18,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "未使用：「０」を設定する。"
+    },
+    {
+      "seq": 19,
+      "name": "歯科特定薬剤",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "歯科特定薬剤に係る対象医薬品であるか否かを表す。\n０：歯科特定薬剤以外\n１：歯科特定薬剤",
+      "codes": [
+        {
+          "code": "0",
+          "name": "歯科特定薬剤以外"
+        },
+        {
+          "code": "1",
+          "name": "歯科特定薬剤"
+        }
+      ]
+    },
+    {
+      "seq": 20,
+      "name": "造影（補助）剤",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "造影剤又は造影補助剤に係る対象医薬品であるか否かを表\nす。\n０：「１」及び「２」以外の医薬品\n１：造影剤\n２：造影補助剤",
+      "codes": [
+        {
+          "code": "0",
+          "name": "「１」及び「２」以外の医薬品"
+        },
+        {
+          "code": "1",
+          "name": "造影剤"
+        },
+        {
+          "code": "2",
+          "name": "造影補助剤"
+        }
+      ]
+    },
+    {
+      "seq": 21,
+      "name": "注射容量",
+      "mode": "numeric",
+      "maxBytes": 5,
+      "itemFormat": "可変",
+      "description": "当該医薬品が注射薬の場合（当分の間、２０ｍＬ以上の注\n射薬に限る。）、その容量（ｍＬ）を表す。\nなお、輸血用血液製剤（解凍人赤血球液を除く。）は、輸\n血料の算定において、基準となる容量を設定する。"
+    },
+    {
+      "seq": 22,
+      "name": "収載方式等識別",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "当該医薬品の薬価基準収載方式の分類を表す。\n０：「１」から「８」以外の医薬品\n１：日本薬局方収載医薬品（局方品）\n２：局方品で生物学的製剤基準医薬品\n３：局方品で生薬\n６：生物学的製剤基準医薬品\n７：生薬\n８：「１」から「７」以外の統一名収載医薬品",
+      "codes": [
+        {
+          "code": "0",
+          "name": "「１」から「８」以外の医薬品"
+        },
+        {
+          "code": "1",
+          "name": "日本薬局方収載医薬品（局方品）"
+        },
+        {
+          "code": "2",
+          "name": "局方品で生物学的製剤基準医薬品"
+        },
+        {
+          "code": "3",
+          "name": "局方品で生薬"
+        },
+        {
+          "code": "6",
+          "name": "生物学的製剤基準医薬品"
+        },
+        {
+          "code": "7",
+          "name": "生薬"
+        },
+        {
+          "code": "8",
+          "name": "「１」から「７」以外の統一名収載医薬品"
+        }
+      ]
+    },
+    {
+      "seq": 23,
+      "name": "商品名等関連",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "可変",
+      "description": "当該医薬品が商品名医薬品(非告示品)の場合、統一名収載\n医薬品(告示品)の医薬品コードを設定する。\nなお、商品名医薬品でない場合は「０」を設定する。"
+    },
+    {
+      "seq": 24,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "未使用：「０」を設定する。"
+    },
+    {
+      "seq": 25,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 13,
+      "itemFormat": "可変",
+      "description": "未使用：「０」を設定する。"
+    },
+    {
+      "seq": 26,
+      "name": "漢字名称変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "該当項目の変更有無を表す。\n０：当該項目の内容に変更なし\n１：当該項目の内容に変更あり",
+      "codes": [
+        {
+          "code": "0",
+          "name": "当該項目の内容に変更なし"
+        },
+        {
+          "code": "1",
+          "name": "当該項目の内容に変更あり"
+        }
+      ]
+    },
+    {
+      "seq": 27,
+      "name": "カナ名称変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 28,
+      "name": "剤形",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "当該医薬品の剤形を表す。\n１：内用薬\n３：その他\n４：注射薬\n６：外用薬\n８：歯科用薬剤",
+      "codes": [
+        {
+          "code": "1",
+          "name": "内用薬"
+        },
+        {
+          "code": "3",
+          "name": "その他"
+        },
+        {
+          "code": "4",
+          "name": "注射薬"
+        },
+        {
+          "code": "6",
+          "name": "外用薬"
+        },
+        {
+          "code": "8",
+          "name": "歯科用薬剤"
+        }
+      ]
+    },
+    {
+      "seq": 29,
+      "name": "予備",
+      "mode": "alphanumeric",
+      "maxBytes": 49,
+      "itemFormat": "可変",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 30,
+      "name": "変更年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該医薬品の情報に変更等が生じた場合、適用となる日付\nを西暦年「４桁」、月「２桁」及び日「２桁」の８桁で表\nす。"
+    },
+    {
+      "seq": 31,
+      "name": "廃止年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該医薬品の使用が可能な最終日付を西暦年「４桁」、月\n「２桁」及び日「２桁」の８桁で表す。\nなお、廃止した医薬品コード以外は「９９９９９９９９」\nを設定する。"
+    },
+    {
+      "seq": 32,
+      "name": "薬価基準収載医薬品コード",
+      "mode": "alphanumeric",
+      "maxBytes": 12,
+      "itemFormat": "可変",
+      "description": "当該医薬品の薬価基準収載医薬品コードを表す。\nなお、当該医薬品が商品名医薬品（非告示品）の場合、該\n当する統一名収載品（告示品）の薬価基準収載医薬品コード\nを設定する。"
+    },
+    {
+      "seq": 33,
+      "name": "公表順序番号",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "可変",
+      "description": "薬価基準に収載する当該医薬品の順番を設定する。\nなお、薬価基準改定後に新設された医薬品は「０」を設定\nする。"
+    },
+    {
+      "seq": 34,
+      "name": "経過措置年月日又は商品名医薬品コード使用期限",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "可変",
+      "description": "薬価基準収載医薬品が経過措置品目となった場合又は薬価\n基準未収載の商品名医薬品を廃止する場合、使用期限を西暦\n年「４桁」、月「２桁」及び日「２桁」の８桁で表す。\nなお、経過措置期限又は使用期限がない医薬品は「０」を\n設定する。"
+    },
+    {
+      "seq": 35,
+      "name": "基本漢字名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変",
+      "description": "漢字：１００文字\n当該医薬品の「品名」を表す。"
+    },
+    {
+      "seq": 36,
+      "name": "薬価基準収載年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "可変",
+      "description": "２０２３年３月以降に薬価基準に収載された告示品目につ\nいて、適用となる日付を西暦「４桁」、月「２桁」及び日\n「２桁」の８桁で表す。\nなお、上記以外の医薬品は「０」を設定する。"
+    },
+    {
+      "seq": 37,
+      "name": "一般名コード",
+      "mode": "alphanumeric",
+      "maxBytes": 12,
+      "itemFormat": "可変",
+      "description": "一般名処方マスタの「一般名コード」を表す。\nなお、一般名処方マスタにない医薬品は省略する。"
+    },
+    {
+      "seq": 38,
+      "name": "一般名処方の標準的な記載",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変",
+      "description": "漢字：１００文字\n一般名処方マスタの「一般名処方の標準的な記載」を表\nす。\nなお、一般名処方マスタにない医薬品は省略する。"
+    },
+    {
+      "seq": 39,
+      "name": "一般名処方加算対象区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "一般名処方マスタの「一般名処方加算対象」を表す。\n０：一般名処方マスタにない医薬品\n１：一般名処方マスタに「加算１」と示された医薬品\n２：一般名処方マスタに「加算１、２」と示された医薬品",
+      "codes": [
+        {
+          "code": "0",
+          "name": "一般名処方マスタにない医薬品"
+        },
+        {
+          "code": "1",
+          "name": "一般名処方マスタに「加算１」と示された医薬品"
+        },
+        {
+          "code": "2",
+          "name": "一般名処方マスタに「加算１、２」と示された医薬品"
+        }
+      ]
+    },
+    {
+      "seq": 40,
+      "name": "抗ＨＩＶ薬区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "抗ＨＩＶ薬であるか否かを表す。\n０：「１」以外の医薬品\n１：抗ＨＩＶ薬",
+      "codes": [
+        {
+          "code": "0",
+          "name": "「１」以外の医薬品"
+        },
+        {
+          "code": "1",
+          "name": "抗ＨＩＶ薬"
+        }
+      ]
+    },
+    {
+      "seq": 41,
+      "name": "長期収載品関連",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "可変",
+      "description": "項番４２が「２：対象医薬品（患者希望）」の場合、項番\n４２が「１：対象医薬品（医療上必要があると認める場合\n等）」である同医薬品の医薬品コードを設定する。\nなお、上記以外の医薬品は「０」を設定する。"
+    },
+    {
+      "seq": 42,
+      "name": "選定療養区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "長期収載品の選定療養に係る対象医薬品であるか否かを表\nす。\n０：「１」及び「２」以外の医薬品\n１：対象医薬品（医療上必要があると認める場合等）\n２：対象医薬品（患者希望）",
+      "codes": [
+        {
+          "code": "0",
+          "name": "「１」及び「２」以外の医薬品"
+        },
+        {
+          "code": "1",
+          "name": "対象医薬品（医療上必要があると認める場合等）"
+        },
+        {
+          "code": "2",
+          "name": "対象医薬品（患者希望）"
+        }
+      ]
+    }
+  ]
+}

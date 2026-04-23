@@ -1,0 +1,216 @@
+{
+  "masterId": "shushokugo",
+  "masterName": "修飾語マスター",
+  "subName": null,
+  "version": "20260331",
+  "pages": {
+    "start": 16,
+    "end": 17
+  },
+  "fields": [
+    {
+      "seq": 1,
+      "name": "変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "マスター内容の異動状況を表す。\n０：前マスターの内容と同じであることを表す。\n１：抹消\n２：復活\n３：新規\n５：変更\n９：廃止\n「９：廃止」は、当該コードが旧修飾語管理ファイ\nルに移行したことを表す。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "前マスターの内容と同じであることを表す。"
+        },
+        {
+          "code": "1",
+          "name": "抹消"
+        },
+        {
+          "code": "2",
+          "name": "復活"
+        },
+        {
+          "code": "3",
+          "name": "新規"
+        },
+        {
+          "code": "5",
+          "name": "変更"
+        },
+        {
+          "code": "9",
+          "name": "廃止"
+        }
+      ]
+    },
+    {
+      "seq": 2,
+      "name": "マスター種別",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "「Ｚ」を設定する。\n（修飾語マスターであることを表す。）"
+    },
+    {
+      "seq": 3,
+      "name": "修飾語コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "固定",
+      "description": "修飾語ごとに重複しない番号を設定する。\n０００１～７９９９：傷病名の接頭語に使用\n（０００１～１０００は現在なし）\n８０００～８９９９：傷病名の接尾語に使用\n９０００～９９９９：歯科部位コード（現在なし）\n「ＩＣＤ１０対応標準病名マスター」における「修\n飾語テーブル」の「レセ電算修飾語コード」項目と同\n一内容である。",
+      "flags": {
+        "共通区分※注1": "○"
+      }
+    },
+    {
+      "seq": 4,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "可変",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 5,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 6,
+      "name": "修飾語名称桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変",
+      "description": "項番７「修飾語名称」の文字数を表す。"
+    },
+    {
+      "seq": 7,
+      "name": "修飾語名称",
+      "mode": "text",
+      "maxBytes": 40,
+      "itemFormat": "可変",
+      "description": "漢字：２０文字\n「ＩＣＤ１０対応標準病名マスター」における「修\n飾語テーブル」の「修飾語表記」項目と同一内容であ\nる。",
+      "flags": {
+        "共通区分※注1": "○"
+      }
+    },
+    {
+      "seq": 8,
+      "name": "予備",
+      "mode": "alphanumeric",
+      "maxBytes": 24,
+      "itemFormat": "可変",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 9,
+      "name": "修飾語カナ名称桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変",
+      "description": "項番１０「修飾語カナ名称」の文字数を表す。"
+    },
+    {
+      "seq": 10,
+      "name": "修飾語カナ名称",
+      "mode": "英数\nカナ",
+      "maxBytes": 60,
+      "itemFormat": "可変",
+      "description": "全角英数カナ：３０文字\n項番７「修飾語名称」のカナ名称を表す。\n「ＩＣＤ１０対応標準病名マスター」における「修\n飾語テーブル」の「修飾語表記カナ」項目と同一内容\nである。",
+      "flags": {
+        "共通区分※注1": "○"
+      }
+    },
+    {
+      "seq": 11,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "未使用：省略"
+    },
+    {
+      "seq": 12,
+      "name": "修飾語名称（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "該当項目の変更有無を表す。\n０：当該項目の内容に変更なし\n１：当該項目の内容に変更あり",
+      "codes": [
+        {
+          "code": "0",
+          "name": "当該項目の内容に変更なし"
+        },
+        {
+          "code": "1",
+          "name": "当該項目の内容に変更あり"
+        }
+      ]
+    },
+    {
+      "seq": 13,
+      "name": "修飾語カナ名称（変更情報）",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 14,
+      "name": "収載年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該修飾語を収載した日付を西暦年「４桁」、月\n「２桁」及び日「２桁」の８桁で表す。\nなお、収載年月日は、平成１５年４月１日（西暦２\n００３年４月１日）以降に収載した修飾語に設定して\nいる。"
+    },
+    {
+      "seq": 15,
+      "name": "変更年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該修飾語の情報に変更等が生じた場合、適用とな\nる日付を西暦年「４桁」、月「２桁」及び日「２桁」\nの８桁で表す。"
+    },
+    {
+      "seq": 16,
+      "name": "廃止年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該修飾語の使用が可能な最終日付を西暦年「４\n桁」、月「２桁」及び日「２桁」の８桁で表す。\nなお、廃止した修飾語コード以外は「９９９９９９\n９９」を設定する。"
+    },
+    {
+      "seq": 17,
+      "name": "修飾語管理番号",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "「ＩＣＤ１０対応標準病名マスター」の「修飾語テ\nーブル」の収載項目と同一内容である。",
+      "flags": {
+        "共通区分※注1": "○"
+      }
+    },
+    {
+      "seq": 18,
+      "name": "修飾語交換用コード",
+      "mode": "alphanumeric",
+      "maxBytes": 9,
+      "itemFormat": "可変",
+      "flags": {
+        "共通区分※注1": "○"
+      }
+    },
+    {
+      "seq": 19,
+      "name": "修飾語区分",
+      "mode": "alphanumeric",
+      "maxBytes": 8,
+      "itemFormat": "可変",
+      "description": "項番７「修飾語名称」を次の区分により、先頭２桁\n目で分類する。\n＊１＊＊＊＊＊＊：部位（頭部、頸部等）\n＊２＊＊＊＊＊＊：位置（左、右等）\n＊３＊＊＊＊＊＊：病因（外傷性、感染症等）\n＊４＊＊＊＊＊＊：経過表現（急性、慢性等）\n＊５＊＊＊＊＊＊：状態表現（悪性、良性等）\n＊６＊＊＊＊＊＊：患者帰属（胎児、老人性等）\n＊７＊＊＊＊＊＊：その他（高度、生理的等）\n＊８＊＊＊＊＊＊：接尾語\n＊９＊＊＊＊＊＊：歯科用（未収録）",
+      "flags": {
+        "共通区分※注1": "○"
+      }
+    }
+  ]
+}

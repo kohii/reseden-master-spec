@@ -1,0 +1,211 @@
+[
+  {
+    "masterId": "shoubyomei",
+    "masterName": "傷病名マスター",
+    "subName": null,
+    "pages": {
+      "start": 11,
+      "end": 15
+    },
+    "rawRecordCount": 42,
+    "fieldCount": 46
+  },
+  {
+    "masterId": "shushokugo",
+    "masterName": "修飾語マスター",
+    "subName": null,
+    "pages": {
+      "start": 16,
+      "end": 17
+    },
+    "rawRecordCount": 19,
+    "fieldCount": 19
+  },
+  {
+    "masterId": "shishiki",
+    "masterName": "歯式マスター",
+    "subName": null,
+    "pages": {
+      "start": 18,
+      "end": 19
+    },
+    "rawRecordCount": 8,
+    "fieldCount": 9
+  },
+  {
+    "masterId": "iyakuhin",
+    "masterName": "医薬品マスター",
+    "subName": null,
+    "pages": {
+      "start": 20,
+      "end": 23
+    },
+    "rawRecordCount": 42,
+    "fieldCount": 43
+  },
+  {
+    "masterId": "tokutei_kizai",
+    "masterName": "特定器材マスター",
+    "subName": null,
+    "pages": {
+      "start": 24,
+      "end": 27
+    },
+    "rawRecordCount": 38,
+    "fieldCount": 38
+  },
+  {
+    "masterId": "comment",
+    "masterName": "コメントマスター",
+    "subName": null,
+    "pages": {
+      "start": 28,
+      "end": 29
+    },
+    "rawRecordCount": 21,
+    "fieldCount": 22
+  },
+  {
+    "masterId": "ika_shinryoukoui",
+    "masterName": "医科診療行為マスター",
+    "subName": null,
+    "pages": {
+      "start": 30,
+      "end": 53
+    },
+    "rawRecordCount": 138,
+    "fieldCount": 124
+  },
+  {
+    "masterId": "shika_shinryoukoui",
+    "masterName": "歯科診療行為マスター",
+    "subName": null,
+    "pages": {
+      "start": 54,
+      "end": 62
+    },
+    "rawRecordCount": 68,
+    "fieldCount": 57
+  },
+  {
+    "masterId": "shika_shinryoukoui_イ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "基本・通則加算対応テーブル",
+    "pages": {
+      "start": 63,
+      "end": 63
+    },
+    "rawRecordCount": 10,
+    "fieldCount": 7
+  },
+  {
+    "masterId": "shika_shinryoukoui_ウ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "基本・基本加算対応テーブル",
+    "pages": {
+      "start": 64,
+      "end": 64
+    },
+    "rawRecordCount": 10,
+    "fieldCount": 7
+  },
+  {
+    "masterId": "shika_shinryoukoui_エ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "基本・注加算対応テーブル",
+    "pages": {
+      "start": 65,
+      "end": 65
+    },
+    "rawRecordCount": 10,
+    "fieldCount": 7
+  },
+  {
+    "masterId": "shika_shinryoukoui_オ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "手技・材料加算対応テーブル",
+    "pages": {
+      "start": 66,
+      "end": 66
+    },
+    "rawRecordCount": 10,
+    "fieldCount": 7
+  },
+  {
+    "masterId": "shika_shinryoukoui_カ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "算定回数限度テーブル",
+    "pages": {
+      "start": 67,
+      "end": 67
+    },
+    "rawRecordCount": 13,
+    "fieldCount": 15
+  },
+  {
+    "masterId": "shika_shinryoukoui_キ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "きざみテーブル",
+    "pages": {
+      "start": 68,
+      "end": 70
+    },
+    "rawRecordCount": 18,
+    "fieldCount": 20
+  },
+  {
+    "masterId": "shika_shinryoukoui_ク",
+    "masterName": "歯科診療行為マスター",
+    "subName": "年齢制限テーブル",
+    "pages": {
+      "start": 71,
+      "end": 72
+    },
+    "rawRecordCount": 12,
+    "fieldCount": 14
+  },
+  {
+    "masterId": "shika_shinryoukoui_ケ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "併算定背反テーブル",
+    "pages": {
+      "start": 73,
+      "end": 74
+    },
+    "rawRecordCount": 15,
+    "fieldCount": 14
+  },
+  {
+    "masterId": "shika_shinryoukoui_コ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "実日数関連テーブル",
+    "pages": {
+      "start": 75,
+      "end": 76
+    },
+    "rawRecordCount": 12,
+    "fieldCount": 13
+  },
+  {
+    "masterId": "chouzai_koui",
+    "masterName": "調剤行為マスター",
+    "subName": null,
+    "pages": {
+      "start": 77,
+      "end": 83
+    },
+    "rawRecordCount": 49,
+    "fieldCount": 59
+  },
+  {
+    "masterId": "houmon_kango",
+    "masterName": "訪問看護療養費マスター",
+    "subName": null,
+    "pages": {
+      "start": 84,
+      "end": 95
+    },
+    "rawRecordCount": 75,
+    "fieldCount": 92
+  }
+]

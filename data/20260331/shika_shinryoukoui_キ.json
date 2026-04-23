@@ -1,0 +1,230 @@
+{
+  "masterId": "shika_shinryoukoui_キ",
+  "masterName": "歯科診療行為マスター",
+  "subName": "きざみテーブル",
+  "version": "20260331",
+  "pages": {
+    "start": 68,
+    "end": 70
+  },
+  "fields": [
+    {
+      "seq": 1,
+      "name": "変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "マスター内容の異動状況を表す。\n０：前マスターの内容と同じであることを表す。\n１：抹消\n２：復活\n３：新規\n５：変更\n９：廃止\n「９：廃止」は、当該コードが使用できなくなったことを\n表す。\n次回のマスター更新時に、当該コードを削除する。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "前マスターの内容と同じであることを表す。"
+        },
+        {
+          "code": "1",
+          "name": "抹消"
+        },
+        {
+          "code": "2",
+          "name": "復活"
+        },
+        {
+          "code": "3",
+          "name": "新規"
+        },
+        {
+          "code": "5",
+          "name": "変更"
+        },
+        {
+          "code": "9",
+          "name": "廃止"
+        }
+      ]
+    },
+    {
+      "seq": 2,
+      "name": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定",
+      "description": "基本テーブルに対応した歯科診療行為コードを設定する。"
+    },
+    {
+      "seq": 3,
+      "name": "告示番号/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "歯科点数表に規定する診療行為の区分番号及び項番（「Ａ\n０００」等）を設定する。\n区分番号のアルファベット部を設定する。\n区分番号（アルファベット部を除く。）を設定する。\n区分番号の枝番を設定する。\n項番を設定する。"
+    },
+    {
+      "seq": 4,
+      "name": "告示番号/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 5,
+      "name": "告示番号/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 6,
+      "name": "告示番号/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 7,
+      "name": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定",
+      "description": "加算項目ごとに重複しないコードを設定する。\n加算コードの構成は、「別紙８」の３のとおりである。"
+    },
+    {
+      "seq": 8,
+      "name": "診療行為名称/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変",
+      "description": "漢字：１００文字\n歯科点数表等に基づく診療行為名称を設定する。\n漢字：３２文字\n出力紙レセプト等に出力する名称（省略名称）を設定す\nる。"
+    },
+    {
+      "seq": 9,
+      "name": "診療行為名称/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 10,
+      "name": "点数等識別",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "項番１１「点数」に設定した点数等の種別を表す。\n０：廃止診療行為\n１：金額\n３：点数（プラス）\n４：購入価格（点数）\n５：％加算\n６：％減算\n７：減点診療行為\n８：点数（マイナス）\n点数識別の詳細は「別紙７－１」のとおりである。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "廃止診療行為"
+        },
+        {
+          "code": "1",
+          "name": "金額"
+        },
+        {
+          "code": "3",
+          "name": "点数（プラス）"
+        },
+        {
+          "code": "4",
+          "name": "購入価格（点数）"
+        },
+        {
+          "code": "5",
+          "name": "％加算"
+        },
+        {
+          "code": "6",
+          "name": "％減算"
+        },
+        {
+          "code": "7",
+          "name": "減点診療行為"
+        },
+        {
+          "code": "8",
+          "name": "点数（マイナス）"
+        }
+      ]
+    },
+    {
+      "seq": 11,
+      "name": "点数",
+      "mode": "numeric",
+      "maxBytes": 10,
+      "itemFormat": "可変",
+      "description": "整数部「７桁」、小数点「１桁」及び小数部「２桁」の組\nみ合わせで設定する。"
+    },
+    {
+      "seq": 12,
+      "name": "きざみ単位",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "数量等の単位（「分」等）を表す。\n単位コード一覧は「別紙４－１」のとおりである。"
+    },
+    {
+      "seq": 13,
+      "name": "きざみ下限値",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "可変",
+      "description": "数量データの下限値を表す。\n下限値の制限がない場合は「０」を設定する。"
+    },
+    {
+      "seq": 14,
+      "name": "きざみ上限値",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "可変",
+      "description": "数量データの上限値を表す。\n上限値の制限がない場合は「９９９９９９９９」を設定す\nる。"
+    },
+    {
+      "seq": 15,
+      "name": "きざみ値",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "可変",
+      "description": "項番１６「きざみ点数」を適用する数量データの単位を表\nす。"
+    },
+    {
+      "seq": 16,
+      "name": "きざみ点数",
+      "mode": "numeric",
+      "maxBytes": 10,
+      "itemFormat": "可変",
+      "description": "整数部「７桁」、小数点「１桁」及び小数部「２桁」の組\nみ合わせで設定する。"
+    },
+    {
+      "seq": 17,
+      "name": ""
+    },
+    {
+      "seq": 18,
+      "name": "変更年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該診療行為の情報に変更等が生じた場合、適用となる日\n付を西暦年「４桁」、月「２桁」及び日「２桁」の８桁で表\nす。"
+    },
+    {
+      "seq": 19,
+      "name": "廃止年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該診療行為の使用が可能な最終日付を西暦年「４桁」、\n月「２桁」及び日「２桁」の８桁で表す。\nなお、廃止した歯科診療行為コード以外は「９９９９９９\n９９」を設定する。"
+    },
+    {
+      "seq": 20,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "未使用：「０」を設定する。"
+    }
+  ]
+}
