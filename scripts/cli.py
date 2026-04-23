@@ -193,6 +193,125 @@ def cmd_code(args: argparse.Namespace) -> int:
     return 0
 
 
+_VALID_MODES = {"numeric", "alphanumeric", "text", "date", ""}
+
+
+def _verify_master(master: dict[str, Any]) -> list[dict[str, Any]]:
+    """1マスターの自己整合性をチェック。問題を dict のリストで返す。"""
+    issues: list[dict[str, Any]] = []
+    fields = master["fields"]
+    if not fields:
+        issues.append({"severity": "error", "message": "no fields extracted"})
+        return issues
+
+    seqs = [f["seq"] for f in fields]
+    seq_set = sorted(set(seqs))
+    # seqの飛び（範囲表記の取りこぼしや pdfplumber 欠落の検出）
+    expected = list(range(seq_set[0], seq_set[-1] + 1))
+    missing = sorted(set(expected) - set(seq_set))
+    if missing:
+        issues.append(
+            {
+                "severity": "warning",
+                "message": f"missing seq numbers: {missing[:20]}"
+                + ("..." if len(missing) > 20 else ""),
+                "missingCount": len(missing),
+            }
+        )
+
+    for f in fields:
+        name = f.get("name", "")
+        if not name:
+            issues.append(
+                {"severity": "error", "seq": f["seq"], "message": "empty name"}
+            )
+        elif "\n" in name:
+            issues.append(
+                {
+                    "severity": "warning",
+                    "seq": f["seq"],
+                    "message": f"name contains newline: {name!r}",
+                }
+            )
+        mode = f.get("mode", "")
+        if mode not in _VALID_MODES:
+            issues.append(
+                {
+                    "severity": "warning",
+                    "seq": f["seq"],
+                    "message": f"unexpected mode value: {mode!r}",
+                }
+            )
+        for c in f.get("codes", []):
+            if len(c.get("name", "")) > 200:
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "seq": f["seq"],
+                        "code": c["code"],
+                        "message": "code name too long (>200 chars); may contain spillover description",
+                    }
+                )
+    return issues
+
+
+def cmd_verify(args: argparse.Namespace) -> int:
+    data_dir = _data_dir(args.out_dir)
+    version = _resolve_version(data_dir, args.version)
+    manifest = _load_manifest(data_dir, version)
+    report: dict[str, Any] = {
+        "version": version,
+        "masters": [],
+        "ok": True,
+    }
+    for m in manifest["masters"]:
+        master = _load_master(data_dir, version, m["masterId"])
+        issues = _verify_master(master)
+        entry = {
+            "masterId": m["masterId"],
+            "fieldCount": len(master["fields"]),
+            "issues": issues,
+        }
+        if args.baseline:
+            baseline_manifest = _load_manifest(data_dir, args.baseline)
+            baseline_m = next(
+                (bm for bm in baseline_manifest["masters"] if bm["masterId"] == m["masterId"]),
+                None,
+            )
+            if baseline_m is None:
+                entry["baselineDiff"] = {"status": "added"}
+            else:
+                diff = len(master["fields"]) - baseline_m["fieldCount"]
+                entry["baselineDiff"] = {
+                    "status": "changed" if diff else "same",
+                    "fieldCountDelta": diff,
+                    "baselineFieldCount": baseline_m["fieldCount"],
+                }
+                if baseline_m["fieldCount"] > 0 and abs(diff) / baseline_m["fieldCount"] > 0.2:
+                    issues.append(
+                        {
+                            "severity": "warning",
+                            "message": (
+                                f"field count changed by {diff:+d} "
+                                f"({diff*100/baseline_m['fieldCount']:+.0f}%) vs {args.baseline}"
+                            ),
+                        }
+                    )
+        if any(i["severity"] == "error" for i in issues):
+            report["ok"] = False
+        report["masters"].append(entry)
+
+    if args.baseline:
+        baseline_manifest = _load_manifest(data_dir, args.baseline)
+        base_ids = {bm["masterId"] for bm in baseline_manifest["masters"]}
+        cur_ids = {m["masterId"] for m in manifest["masters"]}
+        report["baselineRemoved"] = sorted(base_ids - cur_ids)
+        report["baselineAdded"] = sorted(cur_ids - base_ids)
+
+    _dump(report)
+    return 0 if report["ok"] else 1
+
+
 def cmd_search(args: argparse.Namespace) -> int:
     data_dir = _data_dir(args.out_dir)
     version = _resolve_version(data_dir, args.version)
@@ -268,6 +387,13 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("code")
     sp.add_argument("--version")
     sp.set_defaults(func=cmd_code)
+
+    sp = sub.add_parser(
+        "verify", help="Check extracted JSON for anomalies (seq gaps, empty names, etc.)"
+    )
+    sp.add_argument("--version")
+    sp.add_argument("--baseline", help="Compare with another version for regression detection")
+    sp.set_defaults(func=cmd_verify)
 
     sp = sub.add_parser("search", help="Keyword search within field names/descriptions")
     sp.add_argument("keyword")

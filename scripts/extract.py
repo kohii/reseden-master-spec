@@ -569,7 +569,9 @@ def normalize_records(raw_records: list[dict[str, Any]]) -> list[dict[str, Any]]
             full_name = f"{name}/{sub_name}" if name else sub_name
         content = rec["content"]
         mb_info = parse_max_bytes(rec["max_bytes_raw"])
-        mode = MODE_MAP.get(rec["mode_raw"], rec["mode_raw"]) or None
+        # mode の改行（英数\nカナ 等）を結合してから enum lookup
+        mode_normalized = "".join(_normalize_mode_lines(_split_lines(rec["mode_raw"]))) if rec["mode_raw"] else ""
+        mode = MODE_MAP.get(mode_normalized, mode_normalized) or None
         codes = parse_codes(content)
         entry: dict[str, Any] = {"seq": seq, "name": full_name}
         if sub_name and name:
