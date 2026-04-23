@@ -289,6 +289,49 @@ def _normalize_mode_lines(lines: list[str]) -> list[str]:
     return result
 
 
+# 丸数字 "①〜⑩" "⑪〜⑳"
+_CIRCLED_DIGITS = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳"
+
+
+def _resolve_seq_range(seq_lines: list[str]) -> tuple[int, int] | None:
+    """["72","～","81"] や ["10","〜","17"] を (72, 81) に解釈。失敗時None。"""
+    flat = " ".join(seq_lines)
+    # 改行/空白を除いた "N～M" の形を検出
+    m = re.search(r"(\d+)\s*[～〜~\-]\s*(\d+)", to_half_digits(flat))
+    if not m:
+        return None
+    start, end = int(m.group(1)), int(m.group(2))
+    if 0 < start <= end:
+        return (start, end)
+    return None
+
+
+def _extract_group_labels(parent_name: str, expected_count: int) -> list[str]:
+    """親nameに "①〜⑩" のような繰返しラベル表現があれば、expected_count 分の
+    丸数字ラベルリストを返す。なければ空リスト。"""
+    if not parent_name:
+        return []
+    m = re.search(r"([①-⑳])\s*[～〜~\-]\s*([①-⑳])", parent_name)
+    if not m:
+        return []
+    start_idx = _CIRCLED_DIGITS.index(m.group(1))
+    end_idx = _CIRCLED_DIGITS.index(m.group(2))
+    if end_idx - start_idx + 1 != expected_count:
+        return []
+    return list(_CIRCLED_DIGITS[start_idx : end_idx + 1])
+
+
+def _strip_group_label_notation(name: str) -> str:
+    """親name中の "①〜⑩" 表記を除去する。 "施設基準①〜⑩" → "施設基準"。"""
+    return re.sub(r"[①-⑳]\s*[～〜~\-]\s*[①-⑳]", "", name).strip()
+
+
+def _pick_or_last(lst: list[str], i: int) -> str:
+    if not lst:
+        return ""
+    return lst[i] if i < len(lst) else lst[-1]
+
+
 def expand_parent_child(raw_records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     """親行＋子行をマージし、サブ項目を展開したフラットなレコード列にする。
 
@@ -327,20 +370,15 @@ def expand_parent_child(raw_records: list[dict[str, Any]]) -> list[dict[str, Any
             merged.append(rec)
             return
 
-        def pick(lst: list[str], i: int) -> str:
-            if not lst:
-                return ""
-            return lst[i] if i < len(lst) else lst[-1]
-
         for i in range(n):
             merged.append(
                 {
-                    "seq_raw": pick(seqs, i),
+                    "seq_raw": _pick_or_last(seqs, i),
                     "name": "",
-                    "sub_name": pick(sub_names, i),
-                    "mode_raw": pick(modes, i),
-                    "max_bytes_raw": pick(bytes_list, i),
-                    "item_format_raw": pick(formats, i),
+                    "sub_name": _pick_or_last(sub_names, i),
+                    "mode_raw": _pick_or_last(modes, i),
+                    "max_bytes_raw": _pick_or_last(bytes_list, i),
+                    "item_format_raw": _pick_or_last(formats, i),
                     "content": rec["content"] if i == 0 else "",
                     "flags": rec.get("flags") or {},
                 }
@@ -388,41 +426,62 @@ def expand_parent_child(raw_records: list[dict[str, Any]]) -> list[dict[str, Any
                 c for c in (parent_content, child_content) if c
             ).strip()
 
-            n = max(
-                len(sub_names),
-                len(modes),
-                len(bytes_list),
-                len(formats),
-            )
+            k = max(len(sub_names), len(modes), len(bytes_list), len(formats))
 
-            # 親行の seq が複数並んでいる → サブ項目の数と一致することが多い
-            seqs_for_subs: list[str] = []
-            if len(parent_seqs_raw) == n:
+            seq_range = _resolve_seq_range(parent_seqs_raw)
+            if seq_range is not None and k > 0:
+                start, end = seq_range
+                n_total = end - start + 1
+                # N×M 展開: n_total が k の倍数なら繰返し構造とみなす
+                if n_total % k == 0 and k > 0:
+                    repeat = n_total // k
+                    labels = _extract_group_labels(pending_parent["name"], repeat)
+                    base_name = (
+                        _strip_group_label_notation(pending_parent["name"].split("\n")[0])
+                        if pending_parent["name"]
+                        else ""
+                    )
+                    for r in range(repeat):
+                        label = labels[r] if labels else ""
+                        group_name = (base_name + label) if base_name else (parent_name + label)
+                        for s in range(k):
+                            seq_val = start + r * k + s
+                            merged.append(
+                                {
+                                    "seq_raw": str(seq_val),
+                                    "name": group_name,
+                                    "sub_name": _pick_or_last(sub_names, s),
+                                    "mode_raw": _pick_or_last(modes, s),
+                                    "max_bytes_raw": _pick_or_last(bytes_list, s),
+                                    "item_format_raw": _pick_or_last(formats, s),
+                                    "content": combined_content if (r == 0 and s == 0) else "",
+                                    "flags": rec.get("flags") or {},
+                                }
+                            )
+                    pending_parent = None
+                    continue
+
+            seqs_for_subs: list[str]
+            if len(parent_seqs_raw) == k:
                 seqs_for_subs = parent_seqs_raw
             elif len(parent_seqs_raw) == 1:
                 # 親seqが1つしかない（例: 項番3「医薬品コード」のサブが区分・番号）
-                seqs_for_subs = [parent_seqs_raw[0]] * n
+                seqs_for_subs = [parent_seqs_raw[0]] * k
             else:
-                # 最良推測: 親のseqをサブ数まで繰り返す or 先頭のみ使用
                 if parent_seqs_raw:
-                    seqs_for_subs = [parent_seqs_raw[0]] * n
+                    seqs_for_subs = [parent_seqs_raw[0]] * k
                 else:
-                    seqs_for_subs = [""] * n
+                    seqs_for_subs = [""] * k
 
-            def pick(lst: list[str], i: int) -> str:
-                if not lst:
-                    return ""
-                return lst[i] if i < len(lst) else (lst[-1] if lst else "")
-
-            for i in range(n):
+            for i in range(k):
                 merged.append(
                     {
                         "seq_raw": seqs_for_subs[i] if i < len(seqs_for_subs) else "",
                         "name": parent_name,
-                        "sub_name": pick(sub_names, i),
-                        "mode_raw": pick(modes, i),
-                        "max_bytes_raw": pick(bytes_list, i),
-                        "item_format_raw": pick(formats, i),
+                        "sub_name": _pick_or_last(sub_names, i),
+                        "mode_raw": _pick_or_last(modes, i),
+                        "max_bytes_raw": _pick_or_last(bytes_list, i),
+                        "item_format_raw": _pick_or_last(formats, i),
                         "content": combined_content if i == 0 else "",
                         "flags": rec.get("flags") or {},
                     }

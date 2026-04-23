@@ -63,7 +63,7 @@
       "end": 29
     },
     "rawRecordCount": 21,
-    "fieldCount": 22
+    "fieldCount": 28
   },
   {
     "masterId": "ika_shinryoukoui",
@@ -74,7 +74,7 @@
       "end": 53
     },
     "rawRecordCount": 138,
-    "fieldCount": 124
+    "fieldCount": 133
   },
   {
     "masterId": "shika_shinryoukoui",
@@ -195,7 +195,7 @@
       "end": 83
     },
     "rawRecordCount": 49,
-    "fieldCount": 59
+    "fieldCount": 68
   },
   {
     "masterId": "houmon_kango",
@@ -206,6 +206,6 @@
       "end": 95
     },
     "rawRecordCount": 75,
-    "fieldCount": 92
+    "fieldCount": 106
   }
 ]

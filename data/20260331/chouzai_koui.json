@@ -481,12 +481,84 @@
     },
     {
       "seq": 31,
-      "name": "施設基準①～⑩/施設基準コード",
+      "name": "施設基準①/施設基準コード",
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 3,
       "itemFormat": "固定",
       "description": "先頭から最大１０項目まで、施設基準コードを設定す\nる。\n施設基準を要する調剤行為であるか否かを表す。\n施設基準コードの設定方法は「別紙９－４」のとおりで\nある。"
+    },
+    {
+      "seq": 32,
+      "name": "施設基準②/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 33,
+      "name": "施設基準③/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 34,
+      "name": "施設基準④/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 35,
+      "name": "施設基準⑤/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 36,
+      "name": "施設基準⑥/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 37,
+      "name": "施設基準⑦/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 38,
+      "name": "施設基準⑧/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 39,
+      "name": "施設基準⑨/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 40,
+      "name": "施設基準⑩/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
     },
     {
       "seq": 41,

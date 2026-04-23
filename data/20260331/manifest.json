@@ -66,7 +66,7 @@
         "end": 29
       },
       "file": "comment.json",
-      "fieldCount": 22
+      "fieldCount": 28
     },
     {
       "masterId": "ika_shinryoukoui",
@@ -77,7 +77,7 @@
         "end": 53
       },
       "file": "ika_shinryoukoui.json",
-      "fieldCount": 124
+      "fieldCount": 133
     },
     {
       "masterId": "shika_shinryoukoui",
@@ -198,7 +198,7 @@
         "end": 83
       },
       "file": "chouzai_koui.json",
-      "fieldCount": 59
+      "fieldCount": 68
     },
     {
       "masterId": "houmon_kango",
@@ -209,7 +209,7 @@
         "end": 95
       },
       "file": "houmon_kango.json",
-      "fieldCount": 92
+      "fieldCount": 106
     }
   ]
 }

@@ -322,12 +322,124 @@
     },
     {
       "seq": 29,
-      "name": "職種区分①～⑮/職種等コード",
+      "name": "職種区分①/職種等コード",
       "shortName": "職種等コード",
       "mode": "numeric",
       "maxBytes": 2,
       "itemFormat": "固定",
       "description": "先頭から最大１５項目まで、職種等コードを設定する。\n当該訪問看護療養費を算定可能な職種等コードか否かを表\nす。\n職種等コードは「別紙１０－３」のとおりである。"
+    },
+    {
+      "seq": 30,
+      "name": "職種区分②/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 31,
+      "name": "職種区分③/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 32,
+      "name": "職種区分④/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 33,
+      "name": "職種区分⑤/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 34,
+      "name": "職種区分⑥/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 35,
+      "name": "職種区分⑦/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 36,
+      "name": "職種区分⑧/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 37,
+      "name": "職種区分⑨/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 38,
+      "name": "職種区分⑩/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 39,
+      "name": "職種区分⑪/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 40,
+      "name": "職種区分⑫/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 41,
+      "name": "職種区分⑬/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 42,
+      "name": "職種区分⑭/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 43,
+      "name": "職種区分⑮/職種等コード",
+      "shortName": "職種等コード",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
     },
     {
       "seq": 44,

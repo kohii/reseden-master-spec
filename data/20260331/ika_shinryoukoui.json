@@ -1594,12 +1594,84 @@
     },
     {
       "seq": 72,
-      "name": "施設基準①～⑩/施設基準コード",
+      "name": "施設基準①/施設基準コード",
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
       "itemFormat": "可変",
       "description": "施設基準を要する診療行為に、先頭から最大１０項目まで\n施設基準コードを設定する。\n施設基準を要する診療行為であるか否かを表す。\n施設基準コードは「別紙７－８」のとおりである。"
+    },
+    {
+      "seq": 73,
+      "name": "施設基準②/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 74,
+      "name": "施設基準③/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 75,
+      "name": "施設基準④/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 76,
+      "name": "施設基準⑤/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 77,
+      "name": "施設基準⑥/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 78,
+      "name": "施設基準⑦/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 79,
+      "name": "施設基準⑧/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 80,
+      "name": "施設基準⑨/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 81,
+      "name": "施設基準⑩/施設基準コード",
+      "shortName": "施設基準コード",
+      "mode": "numeric",
+      "maxBytes": 4,
+      "itemFormat": "可変"
     },
     {
       "seq": 82,

@@ -137,7 +137,7 @@
     },
     {
       "seq": 10,
-      "name": "レセプト編集情報/カラム位置",
+      "name": "レセプト編集情報①/カラム位置",
       "shortName": "カラム位置",
       "mode": "numeric",
       "maxBytes": 2,
@@ -145,8 +145,56 @@
       "description": "コメントコードのパターンが「４０」の場合に使用する。\n先頭項目から使用し、最大４項目まで使用可能である。\nコメントコードのパターンが「４０」以外の場合は、すべ\nて「０」を設定する。\nレセプト編集情報の設定事例は「別紙６－２」のとおりで\nある。\n記録した数字情報の編集位置を表す。\nカラム位置から編集する数字情報の文字数を表す。"
     },
     {
-      "seq": 10,
-      "name": "レセプト編集情報/桁数",
+      "seq": 11,
+      "name": "レセプト編集情報①/桁数",
+      "shortName": "桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 12,
+      "name": "レセプト編集情報②/カラム位置",
+      "shortName": "カラム位置",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 13,
+      "name": "レセプト編集情報②/桁数",
+      "shortName": "桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 14,
+      "name": "レセプト編集情報③/カラム位置",
+      "shortName": "カラム位置",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 15,
+      "name": "レセプト編集情報③/桁数",
+      "shortName": "桁数",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 16,
+      "name": "レセプト編集情報④/カラム位置",
+      "shortName": "カラム位置",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 17,
+      "name": "レセプト編集情報④/桁数",
       "shortName": "桁数",
       "mode": "numeric",
       "maxBytes": 2,
