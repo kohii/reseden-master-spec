@@ -309,23 +309,33 @@ def _resolve_seq_range(seq_lines: list[str]) -> tuple[int, int] | None:
 
 
 def _extract_group_labels(parent_name: str, expected_count: int) -> list[str]:
-    """親nameに "①〜⑩" のような繰返しラベル表現があれば、expected_count 分の
-    丸数字ラベルリストを返す。なければ空リスト。"""
+    """親nameに "①〜⑩" "１～１０" のような繰返しラベル表現があれば、
+    expected_count 分のラベルリストを返す。なければ空リスト。"""
     if not parent_name:
         return []
+    # 丸数字
     m = re.search(r"([①-⑳])\s*[～〜~\-]\s*([①-⑳])", parent_name)
-    if not m:
+    if m:
+        start_idx = _CIRCLED_DIGITS.index(m.group(1))
+        end_idx = _CIRCLED_DIGITS.index(m.group(2))
+        if end_idx - start_idx + 1 == expected_count:
+            return list(_CIRCLED_DIGITS[start_idx : end_idx + 1])
         return []
-    start_idx = _CIRCLED_DIGITS.index(m.group(1))
-    end_idx = _CIRCLED_DIGITS.index(m.group(2))
-    if end_idx - start_idx + 1 != expected_count:
-        return []
-    return list(_CIRCLED_DIGITS[start_idx : end_idx + 1])
+    # 数字ラベル (1〜10 / １～１０)
+    m = re.search(r"([0-9０-９]+)\s*[～〜~\-]\s*([0-9０-９]+)", parent_name)
+    if m:
+        a = int(to_half_digits(m.group(1)))
+        b = int(to_half_digits(m.group(2)))
+        if a < b and b - a + 1 == expected_count:
+            return [str(i) for i in range(a, b + 1)]
+    return []
 
 
 def _strip_group_label_notation(name: str) -> str:
-    """親name中の "①〜⑩" 表記を除去する。 "施設基準①〜⑩" → "施設基準"。"""
-    return re.sub(r"[①-⑳]\s*[～〜~\-]\s*[①-⑳]", "", name).strip()
+    """親name中の "①〜⑩" や "１～１０" 表記を除去する。"""
+    name = re.sub(r"[①-⑳]\s*[～〜~\-]\s*[①-⑳]", "", name)
+    name = re.sub(r"[0-9０-９]+\s*[～〜~\-]\s*[0-9０-９]+", "", name)
+    return name.strip()
 
 
 def _pick_or_last(lst: list[str], i: int) -> str:
@@ -692,12 +702,23 @@ def _recover_ranged_fields(
     raw: list[dict[str, Any]],
     ranges: list[dict[str, Any]],
     defective_seqs: set[int],
+    existing_fields: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
-    """範囲ヘッダ + 孤立子行 から N×M 展開された field entries を生成する。"""
+    """範囲ヘッダ + 孤立子行 から N×M 展開された field entries を生成する。
+
+    existing_fields が与えられた場合、孤立子が見つからないときのフォールバックとして
+    範囲内に存在する既存フィールド (たとえば終端付近のみ拾われたもの) をテンプレート
+    として利用する。
+    """
     produced: list[dict[str, Any]] = []
+    existing_by_seq: dict[int, dict[str, Any]] = {
+        f["seq"]: f for f in (existing_fields or [])
+    }
     for rng in ranges:
         span_seqs = set(range(rng["start"], rng["end"] + 1))
-        if not span_seqs.issubset(defective_seqs):
+        # span のうち defective が過半数を占める場合に展開対象とする
+        defective_in_span = span_seqs & defective_seqs
+        if len(defective_in_span) < max(1, len(span_seqs) // 2):
             continue
         # 範囲ヘッダから ①〜④ などのラベルを拾い、繰返し回数を決定
         n_total = rng["end"] - rng["start"] + 1
@@ -713,6 +734,37 @@ def _recover_ranged_fields(
                     best_child = (child, sub_count, repeat, lbs)
                     break
         if best_child is None:
+            # フォールバック: 既存フィールドを template にして子行無しで展開
+            template_seq = next(
+                (s for s in span_seqs if s in existing_by_seq), None
+            )
+            if template_seq is None:
+                continue
+            template = existing_by_seq[template_seq]
+            labels = _extract_group_labels(rng["name"], n_total)
+            if not labels:
+                continue
+            repeat = n_total
+            k = 1
+            # template を各 seq に複製する
+            base_name = _strip_group_label_notation(rng["name"])
+            template_short = template.get("shortName") or template.get("name") or ""
+            for r in range(repeat):
+                label = labels[r]
+                group_name = base_name + label
+                seq_val = rng["start"] + r
+                entry: dict[str, Any] = {
+                    "seq": seq_val,
+                    "name": f"{group_name}/{template_short}",
+                    "shortName": template_short,
+                }
+                for key in ("mode", "maxBytes", "itemFormat"):
+                    if key in template:
+                        entry[key] = template[key]
+                if r == 0 and rng.get("description"):
+                    entry["description"] = rng["description"]
+                entry["_source"] = "range+template"
+                produced.append(entry)
             continue
         child, k, repeat, labels = best_child
         sub_names = _split_lines(child["sub_name"])
@@ -801,10 +853,14 @@ def extract_master(
             ranges = text_supplement.find_seq_ranges(
                 pdf_path, section.start_page, section.end_page
             )
-            range_recovered = _recover_ranged_fields(raw, ranges, defective)
+            range_recovered = _recover_ranged_fields(
+                raw, ranges, defective, existing_fields=normalized
+            )
             if range_recovered:
-                normalized.extend(range_recovered)
                 recovered_seqs = {f["seq"] for f in range_recovered}
+                # 置換対象の既存 field (同 seq) を除去
+                normalized = [f for f in normalized if f["seq"] not in recovered_seqs]
+                normalized.extend(range_recovered)
                 defective -= recovered_seqs
 
             supplemental = text_supplement.supplement_from_text(

@@ -35,10 +35,25 @@ _MODE_AT_RE = re.compile(
 )
 
 _ZEN2HAN = str.maketrans("０１２３４５６７８９", "0123456789")
+_CIRCLED_DIGITS = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳"
 
 
 def _zh(s: str) -> str:
     return s.translate(_ZEN2HAN)
+
+
+def _count_labels(name: str) -> int:
+    """"施設基準①～⑩" や "背反１～１０" 等から繰返し回数 (10) を返す。無ければ 0。"""
+    m = re.search(r"([①-⑳])\s*[～〜~\-]\s*([①-⑳])", name)
+    if m:
+        return _CIRCLED_DIGITS.index(m.group(2)) - _CIRCLED_DIGITS.index(m.group(1)) + 1
+    # 数字ラベル (1〜10 / １～１０)
+    m = re.search(r"([0-9０-９]+)\s*[～〜~\-]\s*([0-9０-９]+)", name)
+    if m:
+        a, b = int(_zh(m.group(1))), int(_zh(m.group(2)))
+        if a < b:
+            return b - a + 1
+    return 0
 
 
 def pdftotext_pages(pdf_path: Path, start: int, end: int) -> list[str]:
@@ -143,12 +158,18 @@ def supplement_from_text(
 # 範囲ヘッダ行: "100 年齢加算①～④  ５２  当該..." のようなパターン
 # サブ項目名＋モード＋バイト等が欠けていることが多いので、
 # 「項番 + 項目名 + (maxBytes) + (内容先頭)」のゆるいマッチに留める。
-# 全角/半角数字の両方をサポート。
+# ラベル表現: "①～⑩" / "１～１０" / "1〜10" などを許容。
+_LABEL_NUM = r"(?:[①-⑳]|[0-9０-９]{1,2})"
 _RANGE_HEADER_RE = re.compile(
-    r"^\s*(?P<seq_start>[0-9０-９]+)\s+(?P<name>.+?[①-⑳]\s*[～〜~\-]\s*[①-⑳])"
+    r"^\s*(?P<seq_start>[0-9０-９]+)\s+(?P<name>.+?"
+    + _LABEL_NUM
+    + r"\s*[～〜~\-]\s*"
+    + _LABEL_NUM
+    + r")"
     r"(?:\s+(?P<max_bytes>[0-9０-９]+))?"
 )
-_RANGE_TILDE_RE = re.compile(r"^\s*[～〜~]\s*$")
+# 行頭が "～" の行 (単独、または "～ <説明文>" の形)
+_RANGE_TILDE_RE = re.compile(r"^\s*[～〜~](\s|$)")
 _RANGE_END_RE = re.compile(r"^\s*([0-9０-９]+)\s*$")
 
 
@@ -176,17 +197,54 @@ def find_seq_ranges(pdf_path: Path, start: int, end: int) -> list[dict[str, Any]
             if tail:
                 description_lines.append(tail)
             j = i + 1
-            while j < len(lines) and j < i + 8:
+            saw_tilde = False
+            while j < len(lines) and j < i + 60:
                 nxt = lines[j].rstrip()
                 if _RANGE_TILDE_RE.match(nxt):
+                    saw_tilde = True
+                    # "～" 以降の説明文を description に取り込む
+                    rest = re.sub(r"^\s*[～〜~]\s*", "", nxt)
+                    if rest.strip():
+                        description_lines.append(rest.strip())
                     j += 1
                     continue
                 m2 = _RANGE_END_RE.match(nxt)
                 if m2:
-                    end_seq = int(_zh(m2.group(1)))
-                    j += 1
+                    candidate = int(_zh(m2.group(1)))
+                    # "〜" を見たあとなら終端、さもなくば直近 (i+5以内) に限定
+                    if saw_tilde:
+                        end_seq = candidate
+                        j += 1
+                        break
+                    if j <= i + 5 and candidate > int(_zh(m.group("seq_start"))):
+                        end_seq = candidate
+                        j += 1
+                        break
+                # 他の項番行 (例: "45 施設基準コード") に当たったら範囲推定。
+                # ヘッダの ①〜⑩ ラベル数から期待される end_seq と比較し、
+                # その項番自体 or 直前を終端とする判定を行う。
+                inner_seq_m = re.match(r"^\s*([0-9０-９]+)\s+\S", nxt)
+                if inner_seq_m and saw_tilde:
+                    candidate = int(_zh(inner_seq_m.group(1)))
+                    start_seq_val = int(_zh(m.group("seq_start")))
+                    label_count = _count_labels(m.group("name"))
+                    if label_count > 0:
+                        expected_end = start_seq_val + label_count - 1
+                        # 1. その項番がラベル終端と一致 → 終端自体が範囲末尾
+                        if candidate == expected_end:
+                            end_seq = candidate
+                            break
+                        # 2. その項番が期待末尾を超える → ヘッダに続く項目は独立
+                        #    範囲終端 = candidate - 1
+                        if candidate > expected_end:
+                            end_seq = candidate - 1
+                            break
+                        # 3. それ以外: ヘッダ末尾推定値を採用
+                        end_seq = expected_end
+                        break
+                    else:
+                        end_seq = candidate - 1
                     break
-                # description 行として蓄積
                 if nxt.strip():
                     description_lines.append(nxt.strip())
                 j += 1
