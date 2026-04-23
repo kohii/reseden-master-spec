@@ -155,6 +155,164 @@ def supplement_from_text(
     return [r for r in records if r["seq"] in missing_seqs]
 
 
+# サブ項目行（seq無し） - "  項目名 モード バイト 形式 内容"
+_SUB_ROW_RE = re.compile(
+    r"^\s+(?P<name>\S.*?)\s+(?P<mode>" + "|".join(_MODE_TOKENS) + r")\s+"
+    r"(?P<bytes>\([0-9０-９]+\)|[0-9０-９]+)\s+"
+    r"(?P<fmt>" + "|".join(_FORMAT_TOKENS) + r")"
+    r"(?:\s+(?P<content>.*))?$"
+)
+
+
+_PAGE_FOOTER_RE = re.compile(r"^\s*-\s*[0-9０-９]+\s*-\s*$")
+_ANY_MODE_TOKEN_RE = re.compile("|".join(_MODE_TOKENS))
+
+
+def _is_page_boilerplate(stripped: str) -> bool:
+    """pdftotext 出力に混入するページフッタ・テーブルヘッダ行かを判定する。
+
+    サブ項目行（例: "項番 数字 3 固定 項番を設定する。"）は除外しない。
+    モードトークン（数字/英数/漢字/カナ）を含まず、かつ
+    「項番 … 項 目 名」や「ﾓｰﾄﾞ ﾊﾞｲﾄ 形式」のようにヘッダ用語が揃っている行だけを
+    ボイラープレートとみなす。
+    """
+    if _PAGE_FOOTER_RE.match(stripped):
+        return True
+    has_mode_token = bool(_ANY_MODE_TOKEN_RE.search(stripped))
+    if has_mode_token:
+        return False
+    # モードトークンを含まない行のうち、以下のヘッダ断片はスキップ
+    if "項番" in stripped and "項 目 名" in stripped:
+        return True
+    if stripped.strip() in ("形 式", "形    式"):
+        return True
+    if "ﾓｰﾄﾞ" in stripped and ("ﾊﾞｲﾄ" in stripped or "形式" in stripped):
+        return True
+    if stripped.strip() in ("ﾓｰﾄﾞ", "ﾊﾞｲﾄ", "ﾊﾞｲﾄ 形式"):
+        return True
+    return False
+
+
+def find_range_subdefinitions(
+    pdf_path: Path, start: int, end: int, rng: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """range header 直後から、1 repetition 分のサブ項目定義を抽出する。
+
+    rng は find_seq_ranges が返す 1エントリ。同じサブ名が再登場した時点で
+    2 周目とみなして打ち切る。range 範囲外の seq 行（例: "100 変更年月日"）
+    に到達しても打ち切る。
+    """
+    lines = pdftotext_pages(pdf_path, start, end)
+    start_seq = rng["start"]
+    end_seq = rng["end"]
+    header_seen = False
+    subs: list[dict[str, Any]] = []
+    seen_names: set[str] = set()
+    pending_description_lines: list[str] = []
+
+    def attach_description():
+        if subs and pending_description_lines:
+            joined = "\n".join(pending_description_lines).strip()
+            if joined:
+                prev = subs[-1].get("content", "")
+                subs[-1]["content"] = (prev + "\n" + joined).strip() if prev else joined
+        pending_description_lines.clear()
+
+    for line in lines:
+        if not header_seen:
+            m = _RANGE_HEADER_RE.match(line)
+            if m and int(_zh(m.group("seq_start"))) == start_seq:
+                header_seen = True
+                # range header 行の末尾（description）に乗った 1個目のサブを拾う
+                tail = line[m.end():].strip()
+                mm = _MODE_AT_RE.match(tail)
+                if mm:
+                    name = mm.group("name").strip()
+                    subs.append(
+                        {
+                            "name": name,
+                            "mode": mm.group("mode"),
+                            "bytes": _zh(mm.group("bytes")),
+                            "fmt": mm.group("fmt"),
+                            "content": (mm.group("content") or "").strip(),
+                        }
+                    )
+                    seen_names.add(name)
+            continue
+
+        stripped = line.strip()
+        if not stripped:
+            # 空行: 現在の sub の description 区切り
+            attach_description()
+            continue
+        # PDF ページフッタ・ヘッダは説明文に混入させない
+        if _is_page_boilerplate(stripped):
+            continue
+        # range 範囲外の独立 seq 行（例: "100 変更年月日"）で打ち切り
+        inner_seq_m = re.match(r"^\s*([0-9０-９]+)\s+\S", line)
+        if inner_seq_m:
+            candidate = int(_zh(inner_seq_m.group(1)))
+            if candidate > end_seq:
+                attach_description()
+                break
+            # 範囲内 seq の行は想定しない（range 本体は seq を持たないサブだけ）
+            # だが誤拾いを避けるため attach して進める
+            attach_description()
+            continue
+        # 範囲終端マーカー行 ("９９" 単独) はスキップ
+        if _RANGE_END_RE.match(line):
+            continue
+        # "～" で始まる行: 後ろに実体があればサブ定義として拾う
+        if _RANGE_TILDE_RE.match(line):
+            rest = re.sub(r"^\s*[～〜~]\s*", "", line.rstrip())
+            if rest.strip():
+                m_tilde = _MODE_AT_RE.match(rest)
+                if m_tilde:
+                    name = m_tilde.group("name").strip()
+                    if name not in seen_names:
+                        attach_description()
+                        subs.append(
+                            {
+                                "name": name,
+                                "mode": m_tilde.group("mode"),
+                                "bytes": _zh(m_tilde.group("bytes")),
+                                "fmt": m_tilde.group("fmt"),
+                                "content": (m_tilde.group("content") or "").strip(),
+                            }
+                        )
+                        seen_names.add(name)
+                    continue
+            continue
+
+        m_sub = _SUB_ROW_RE.match(line)
+        if m_sub:
+            attach_description()
+            name = m_sub.group("name").strip()
+            if name in seen_names:
+                # 2 周目に入ったので打ち切り
+                break
+            subs.append(
+                {
+                    "name": name,
+                    "mode": m_sub.group("mode"),
+                    "bytes": _zh(m_sub.group("bytes")),
+                    "fmt": m_sub.group("fmt"),
+                    "content": (m_sub.group("content") or "").strip(),
+                }
+            )
+            seen_names.add(name)
+            continue
+        # mode/bytes/fmt のない行は親ラベル行 or 説明文。
+        # 短く 15 文字以下なら親ラベルとみなしスキップ、それ以外は直前 sub の description に連結。
+        if len(stripped) <= 15 and not re.search(r"\d", stripped):
+            # 親ラベル行 (告示番号 / 診療行為名称 等): sub として登録しない
+            continue
+        pending_description_lines.append(stripped)
+
+    attach_description()
+    return subs
+
+
 # 範囲ヘッダ行: "100 年齢加算①～④  ５２  当該..." のようなパターン
 # サブ項目名＋モード＋バイト等が欠けていることが多いので、
 # 「項番 + 項目名 + (maxBytes) + (内容先頭)」のゆるいマッチに留める。

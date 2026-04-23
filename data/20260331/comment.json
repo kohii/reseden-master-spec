@@ -126,8 +126,7 @@
       "mode": "numeric",
       "maxBytes": 3,
       "itemFormat": "可変",
-      "description": "項番７「漢字名称」の文字数を表す。",
-      "_source": "text"
+      "description": "項番７「漢字名称」の文字数を表す。"
     },
     {
       "seq": 7,
@@ -135,8 +134,7 @@
       "mode": "text",
       "maxBytes": 300,
       "itemFormat": "可変",
-      "description": "漢字：１５０文字",
-      "_source": "text"
+      "description": "漢字：１５０文字"
     },
     {
       "seq": 8,

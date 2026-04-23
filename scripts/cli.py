@@ -110,9 +110,14 @@ def cmd_fetch(args: argparse.Namespace) -> int:
         print(f"[fetch] using cached {pdf_path}", file=sys.stderr)
 
     version = args.version or extractor.infer_version_from_path(pdf_path)
+    if version == "unknown":
+        sys.exit(
+            f"error: could not infer version (YYYYMMDD) from filename {pdf_path.name!r}. "
+            "Pass --version explicitly."
+        )
     out_dir = data_dir / version
     print(f"[fetch] extracting to {out_dir}", file=sys.stderr)
-    return extractor.main([str(pdf_path), str(out_dir), version])
+    return extractor.main([str(pdf_path), str(out_dir), version, url])
 
 
 def cmd_versions(args: argparse.Namespace) -> int:
@@ -167,23 +172,17 @@ def cmd_field(args: argparse.Namespace) -> int:
     return 0
 
 
-_FULLWIDTH_TO_HALF = str.maketrans(
-    "０１２３４５６７８９ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ",
-    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
-)
-
-
 def cmd_code(args: argparse.Namespace) -> int:
     data_dir = _data_dir(args.out_dir)
     version = _resolve_version(data_dir, args.version)
     master = _load_master(data_dir, version, args.master_id)
-    code_query = args.code.translate(_FULLWIDTH_TO_HALF)
+    code_query = extractor.normalize_code(args.code)
     found: list[dict[str, Any]] = []
     for f in master["fields"]:
         if f["seq"] != args.seq:
             continue
         for c in f.get("codes", []):
-            if c["code"] == code_query:
+            if extractor.normalize_code(c["code"]) == code_query:
                 found.append({"field": f["name"], "code": c})
     if not found:
         sys.exit(
@@ -194,6 +193,9 @@ def cmd_code(args: argparse.Namespace) -> int:
 
 
 _VALID_MODES = {"numeric", "alphanumeric", "text", "date", ""}
+_NAME_TRUNC_SUFFIXES = ("グルー", "コ", "ロ")  # 項目名の末尾が途中切れっぽい断片
+_MISSING_RATIO_ERROR = 0.2  # missing / expected がこの比率を超えたら error
+_MISSING_ABS_ERROR = 20  # missingCount がこの絶対値を超えたら error
 
 
 def _verify_master(master: dict[str, Any]) -> list[dict[str, Any]]:
@@ -210,12 +212,22 @@ def _verify_master(master: dict[str, Any]) -> list[dict[str, Any]]:
     expected = list(range(seq_set[0], seq_set[-1] + 1))
     missing = sorted(set(expected) - set(seq_set))
     if missing:
+        missing_ratio = len(missing) / max(1, len(expected))
+        severity = (
+            "error"
+            if (
+                len(missing) >= _MISSING_ABS_ERROR
+                or missing_ratio >= _MISSING_RATIO_ERROR
+            )
+            else "warning"
+        )
         issues.append(
             {
-                "severity": "warning",
+                "severity": severity,
                 "message": f"missing seq numbers: {missing[:20]}"
                 + ("..." if len(missing) > 20 else ""),
                 "missingCount": len(missing),
+                "missingRatio": round(missing_ratio, 3),
             }
         )
 
@@ -231,6 +243,14 @@ def _verify_master(master: dict[str, Any]) -> list[dict[str, Any]]:
                     "severity": "warning",
                     "seq": f["seq"],
                     "message": f"name contains newline: {name!r}",
+                }
+            )
+        elif any(name.split("/")[-1].endswith(sfx) for sfx in _NAME_TRUNC_SUFFIXES) and len(name) <= 12:
+            issues.append(
+                {
+                    "severity": "warning",
+                    "seq": f["seq"],
+                    "message": f"name may be truncated mid-word: {name!r}",
                 }
             )
         mode = f.get("mode", "")
@@ -258,6 +278,7 @@ def _verify_master(master: dict[str, Any]) -> list[dict[str, Any]]:
 def cmd_verify(args: argparse.Namespace) -> int:
     data_dir = _data_dir(args.out_dir)
     version = _resolve_version(data_dir, args.version)
+    baseline_version = _resolve_version(data_dir, args.baseline) if args.baseline else None
     manifest = _load_manifest(data_dir, version)
     report: dict[str, Any] = {
         "version": version,
@@ -272,8 +293,8 @@ def cmd_verify(args: argparse.Namespace) -> int:
             "fieldCount": len(master["fields"]),
             "issues": issues,
         }
-        if args.baseline:
-            baseline_manifest = _load_manifest(data_dir, args.baseline)
+        if baseline_version:
+            baseline_manifest = _load_manifest(data_dir, baseline_version)
             baseline_m = next(
                 (bm for bm in baseline_manifest["masters"] if bm["masterId"] == m["masterId"]),
                 None,
@@ -293,7 +314,7 @@ def cmd_verify(args: argparse.Namespace) -> int:
                             "severity": "warning",
                             "message": (
                                 f"field count changed by {diff:+d} "
-                                f"({diff*100/baseline_m['fieldCount']:+.0f}%) vs {args.baseline}"
+                                f"({diff*100/baseline_m['fieldCount']:+.0f}%) vs {baseline_version}"
                             ),
                         }
                     )
@@ -301,10 +322,11 @@ def cmd_verify(args: argparse.Namespace) -> int:
             report["ok"] = False
         report["masters"].append(entry)
 
-    if args.baseline:
-        baseline_manifest = _load_manifest(data_dir, args.baseline)
+    if baseline_version:
+        baseline_manifest = _load_manifest(data_dir, baseline_version)
         base_ids = {bm["masterId"] for bm in baseline_manifest["masters"]}
         cur_ids = {m["masterId"] for m in manifest["masters"]}
+        report["baseline"] = baseline_version
         report["baselineRemoved"] = sorted(base_ids - cur_ids)
         report["baselineAdded"] = sorted(cur_ids - base_ids)
 

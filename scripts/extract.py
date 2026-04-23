@@ -5,24 +5,30 @@
 
 出力:
     <output_dir>/
-      manifest.json         # バージョン情報・マスター一覧
-      <master_id>.json      # 各マスターのフィールド定義
-      sections.json         # マスター境界・ページ範囲デバッグ情報
+      manifest.json              # バージョン情報・マスター一覧
+      <master_id>.json           # 各マスターのフィールド定義
+      sections.debug.json        # マスター境界・ページ範囲デバッグ情報
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+import shutil
+import subprocess
 import sys
 import unicodedata
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import pdfplumber
 
 import text_supplement
+
+EXTRACTOR_VERSION = "0.1.0"
 
 # 全角数字→半角
 ZEN2HAN_DIGIT = str.maketrans("０１２３４５６７８９", "0123456789")
@@ -64,6 +70,14 @@ MASTER_ID_MAP: dict[str, str] = {
     "調剤行為マスター": "chouzai_koui",
     "訪問看護療養費マスター": "houmon_kango",
 }
+
+# サブテーブル（「イ 〜テーブル」等の見出しで区切られる）を持つマスター
+_SUBTABLE_ENABLED_MASTERS = frozenset(
+    {
+        "歯科診療行為マスター",
+        "訪問看護療養費マスター",
+    }
+)
 
 
 def normalize_str(s: str | None) -> str:
@@ -122,9 +136,11 @@ def detect_sections(pdf: pdfplumber.PDF) -> list[MasterSection]:
                 sections.append(current_master)
                 break  # このページの他行はスキップ（先頭のマスター見出しのみ拾う）
             sm = SUBTABLE_HEADING_RE.match(line)
-            if sm and current_master and current_master.master_name == "歯科診療行為マスター":
-                # サブテーブル開始
-                # 歯科診療行為マスターの配下サブテーブルとして追加
+            if sm and current_master and current_master.master_name in _SUBTABLE_ENABLED_MASTERS:
+                # サブテーブル開始。親マスター配下のサブテーブルとして追加。
+                # 先頭「ア 基本テーブル」は MASTER_HEADING と同じページに現れ、
+                # そのページは MASTER_HEADING 検出で break するため自然に無視される
+                # （＝ `ア` は親マスター本体として扱われる）。
                 sub_id = f"{current_master.master_id}_{sm.group(1)}"
                 sections.append(
                     MasterSection(
@@ -561,8 +577,17 @@ _NON_CODE_PREFIX_RE = re.compile(
     r"[「『（(＜<※]"
     r"|なお|また|ただし|ただ|その|さらに|そして|つまり|したがって|これらの|ただ|注\s|注[0-9０-９]"
     r"|項番|漢字[:：]|半角|全角|該当|対象|コメント|点数|金額|詳細"
+    r"|例\s|例[0-9０-９]|未使用|使用しない|設定|算定|以下の|以上の|任意"
+    r"|参照|参考|備考|出力|入力|記載|記録|返戻"
     r")"
 )
+# コード名称の最大長（これを超える連結は説明文の混入とみなして打ち切る）
+_CODE_NAME_MAX_LEN = 80
+
+
+def normalize_code(raw: str) -> str:
+    """コード値を NFKC 正規化し前後空白を除去する。抽出・検索で共通のキーとして使う。"""
+    return unicodedata.normalize("NFKC", raw).strip()
 
 
 def parse_codes(content: str) -> list[dict[str, str]]:
@@ -591,7 +616,7 @@ def parse_codes(content: str) -> list[dict[str, str]]:
         if m:
             finish()
             code_raw, name = m.group(1), m.group(2)
-            current = {"code": to_half_digits(code_raw), "name": name.strip()}
+            current = {"code": normalize_code(code_raw), "name": name.strip()}
             continue
         if current is None:
             continue
@@ -604,6 +629,10 @@ def parse_codes(content: str) -> list[dict[str, str]]:
             continue
         # 説明文らしい接頭語で始まる → 終端
         if _NON_CODE_PREFIX_RE.match(line):
+            finish()
+            continue
+        # 既に名称が十分長いのにまだ追加しようとしている → 説明文混入とみなして終端
+        if len(current["name"]) >= _CODE_NAME_MAX_LEN:
             finish()
             continue
         current["name"] = current["name"] + line
@@ -703,6 +732,9 @@ def _recover_ranged_fields(
     ranges: list[dict[str, Any]],
     defective_seqs: set[int],
     existing_fields: list[dict[str, Any]] | None = None,
+    pdf_path: Path | None = None,
+    section_start: int | None = None,
+    section_end: int | None = None,
 ) -> list[dict[str, Any]]:
     """範囲ヘッダ + 孤立子行 から N×M 展開された field entries を生成する。
 
@@ -734,7 +766,42 @@ def _recover_ranged_fields(
                     best_child = (child, sub_count, repeat, lbs)
                     break
         if best_child is None:
-            # フォールバック: 既存フィールドを template にして子行無しで展開
+            # フォールバック1: pdftotext から range 内の 1 cycle 分サブ定義を拾う
+            if pdf_path is not None and section_start and section_end:
+                subs_text = text_supplement.find_range_subdefinitions(
+                    pdf_path, section_start, section_end, rng
+                )
+                if subs_text and len(subs_text) >= 2 and n_total % len(subs_text) == 0:
+                    k_text = len(subs_text)
+                    repeat_text = n_total // k_text
+                    labels_text = _extract_group_labels(rng["name"], repeat_text)
+                    if labels_text:
+                        base_name = _strip_group_label_notation(rng["name"])
+                        for r in range(repeat_text):
+                            label = labels_text[r]
+                            group_name = base_name + label
+                            for s, sub in enumerate(subs_text):
+                                seq_val = rng["start"] + r * k_text + s
+                                mode = MODE_MAP.get(sub["mode"], sub["mode"]) or None
+                                mb = parse_max_bytes(sub["bytes"])
+                                entry: dict[str, Any] = {
+                                    "seq": seq_val,
+                                    "name": f"{group_name}/{sub['name']}",
+                                    "shortName": sub["name"],
+                                }
+                                if mode:
+                                    entry["mode"] = mode
+                                if "max_bytes" in mb:
+                                    entry["maxBytes"] = mb["max_bytes"]
+                                if sub["fmt"]:
+                                    entry["itemFormat"] = sub["fmt"]
+                                if r == 0 and sub.get("content"):
+                                    entry["description"] = sub["content"]
+                                entry["_source"] = "range+text-subs"
+                                produced.append(entry)
+                        continue
+
+            # フォールバック2: 既存フィールドを template にして子行無しで展開
             template_seq = next(
                 (s for s in span_seqs if s in existing_by_seq), None
             )
@@ -829,14 +896,15 @@ def extract_master(
     pdf: pdfplumber.PDF,
     section: MasterSection,
     pdf_path: Path | None = None,
-) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    """セクション範囲内のテーブルを抽出し、rawと正規化結果を返す。
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], dict[str, int]]:
+    """セクション範囲内のテーブルを抽出し、raw / 正規化結果 / ソース別件数 を返す。
 
     pdf_path が与えられた場合、pdfplumber で取りこぼした seq をpdftotext出力から補完する。
+    戻り値の3つ目は {"pdfplumber": N, "range+text": M, ...} の集計（debug用）。
     """
     raw: list[dict[str, Any]] = []
     if section.end_page is None:
-        return raw, []
+        return raw, [], {}
     for page_idx in range(section.start_page - 1, section.end_page):
         page = pdf.pages[page_idx]
         records = extract_table_rows(page)
@@ -854,7 +922,13 @@ def extract_master(
                 pdf_path, section.start_page, section.end_page
             )
             range_recovered = _recover_ranged_fields(
-                raw, ranges, defective, existing_fields=normalized
+                raw,
+                ranges,
+                defective,
+                existing_fields=normalized,
+                pdf_path=pdf_path,
+                section_start=section.start_page,
+                section_end=section.end_page,
             )
             if range_recovered:
                 recovered_seqs = {f["seq"] for f in range_recovered}
@@ -875,9 +949,15 @@ def extract_master(
                 for rec in supplemental:
                     normalized.append(_to_field_entry(rec))
         # seq 順にソート (同seq内は pdfplumber由来を先に)
-        normalized.sort(key=lambda f: (f["seq"], f.get("_source") != "pdfplumber"))
+        normalized.sort(key=lambda f: (f["seq"], f.get("_source") is not None))
 
-    return raw, normalized
+    # _source は内部デバッグ情報。公開JSONからは除去し件数だけdebug側に回す。
+    source_counts: dict[str, int] = {}
+    for f in normalized:
+        src = f.pop("_source", "pdfplumber")
+        source_counts[src] = source_counts.get(src, 0) + 1
+
+    return raw, normalized, source_counts
 
 
 def infer_version_from_path(pdf_path: Path) -> str:
@@ -888,6 +968,39 @@ def infer_version_from_path(pdf_path: Path) -> str:
     return "unknown"
 
 
+def _sha256_of(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _pdftotext_version() -> str:
+    """pdftotext のバージョン文字列を返す。無ければ空文字。"""
+    exe = shutil.which("pdftotext")
+    if not exe:
+        return ""
+    try:
+        # pdftotext -v は stderr に出力する
+        result = subprocess.run(
+            [exe, "-v"], capture_output=True, text=True, check=False
+        )
+        out = (result.stderr or result.stdout or "").strip()
+        first = out.splitlines()[0] if out else ""
+        return first
+    except Exception:
+        return ""
+
+
+def ensure_pdftotext_available() -> None:
+    """pdftotext が見つからない場合に分かりやすいエラーで終了する。"""
+    if not shutil.which("pdftotext"):
+        sys.exit(
+            "error: `pdftotext` not found on PATH. Install Poppler (e.g. `brew install poppler`)."
+        )
+
+
 def main(argv: list[str] | None = None) -> int:
     args = list(argv) if argv is not None else sys.argv[1:]
     if len(args) < 2:
@@ -896,7 +1009,10 @@ def main(argv: list[str] | None = None) -> int:
     pdf_path = Path(args[0]).resolve()
     out_dir = Path(args[1]).resolve()
     version_override = args[2] if len(args) >= 3 else None
+    source_url = args[3] if len(args) >= 4 else None
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    ensure_pdftotext_available()
 
     version = version_override or infer_version_from_path(pdf_path)
     print(f"[extract] pdf={pdf_path.name} version={version}", file=sys.stderr)
@@ -904,6 +1020,14 @@ def main(argv: list[str] | None = None) -> int:
     manifest: dict[str, Any] = {
         "version": version,
         "sourcePdf": pdf_path.name,
+        "sourceUrl": source_url,
+        "sourceSha256": _sha256_of(pdf_path),
+        "extractorVersion": EXTRACTOR_VERSION,
+        "extractedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "dependencies": {
+            "pdfplumber": getattr(pdfplumber, "__version__", "unknown"),
+            "pdftotext": _pdftotext_version(),
+        },
         "masters": [],
     }
     sections_debug: list[dict[str, Any]] = []
@@ -942,7 +1066,7 @@ def main(argv: list[str] | None = None) -> int:
                 + ")",
                 file=sys.stderr,
             )
-            raw, normalized = extract_master(pdf, sec, pdf_path)
+            raw, normalized, source_counts = extract_master(pdf, sec, pdf_path)
             master_file = out_dir / f"{sec.master_id}.json"
             master_data: dict[str, Any] = {
                 "masterId": sec.master_id,
@@ -974,6 +1098,7 @@ def main(argv: list[str] | None = None) -> int:
                     "pages": {"start": sec.start_page, "end": sec.end_page},
                     "rawRecordCount": len(raw),
                     "fieldCount": len(normalized),
+                    "sourceCounts": source_counts,
                 }
             )
 

@@ -74,8 +74,7 @@
       "mode": "numeric",
       "maxBytes": 9,
       "itemFormat": "固定",
-      "description": "項番２「グループ番号」に対応する診療行為に加算可能な\n歯科診療行為コードを設定する。",
-      "_source": "text"
+      "description": "項番２「グループ番号」に対応する診療行為に加算可能な\n歯科診療行為コードを設定する。"
     },
     {
       "seq": 5,
@@ -83,8 +82,7 @@
       "mode": "text",
       "maxBytes": 200,
       "itemFormat": "可変",
-      "description": "漢字：１００文字\n歯科点数表等に基づく診療行為名称を設定する。",
-      "_source": "text"
+      "description": "漢字：１００文字\n歯科点数表等に基づく診療行為名称を設定する。"
     },
     {
       "seq": 6,
@@ -92,8 +90,7 @@
       "mode": "numeric",
       "maxBytes": 2,
       "itemFormat": "固定",
-      "description": "項番２「グループ番号」の同一コード内で、併算定が可能\nな診療行為を単位ごとに識別コードを設定する。",
-      "_source": "text"
+      "description": "項番２「グループ番号」の同一コード内で、併算定が可能\nな診療行為を単位ごとに識別コードを設定する。"
     },
     {
       "seq": 7,

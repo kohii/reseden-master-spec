@@ -8,7 +8,10 @@
       "end": 15
     },
     "rawRecordCount": 42,
-    "fieldCount": 46
+    "fieldCount": 46,
+    "sourceCounts": {
+      "pdfplumber": 46
+    }
   },
   {
     "masterId": "shushokugo",
@@ -19,7 +22,10 @@
       "end": 17
     },
     "rawRecordCount": 19,
-    "fieldCount": 19
+    "fieldCount": 19,
+    "sourceCounts": {
+      "pdfplumber": 19
+    }
   },
   {
     "masterId": "shishiki",
@@ -30,7 +36,10 @@
       "end": 19
     },
     "rawRecordCount": 8,
-    "fieldCount": 9
+    "fieldCount": 9,
+    "sourceCounts": {
+      "pdfplumber": 9
+    }
   },
   {
     "masterId": "iyakuhin",
@@ -41,7 +50,10 @@
       "end": 23
     },
     "rawRecordCount": 42,
-    "fieldCount": 43
+    "fieldCount": 43,
+    "sourceCounts": {
+      "pdfplumber": 43
+    }
   },
   {
     "masterId": "tokutei_kizai",
@@ -52,7 +64,11 @@
       "end": 27
     },
     "rawRecordCount": 38,
-    "fieldCount": 39
+    "fieldCount": 39,
+    "sourceCounts": {
+      "pdfplumber": 38,
+      "text": 1
+    }
   },
   {
     "masterId": "comment",
@@ -63,7 +79,11 @@
       "end": 29
     },
     "rawRecordCount": 21,
-    "fieldCount": 30
+    "fieldCount": 30,
+    "sourceCounts": {
+      "pdfplumber": 28,
+      "text": 2
+    }
   },
   {
     "masterId": "ika_shinryoukoui",
@@ -74,7 +94,12 @@
       "end": 53
     },
     "rawRecordCount": 138,
-    "fieldCount": 151
+    "fieldCount": 151,
+    "sourceCounts": {
+      "pdfplumber": 133,
+      "text": 6,
+      "range+text": 12
+    }
   },
   {
     "masterId": "shika_shinryoukoui",
@@ -85,7 +110,12 @@
       "end": 62
     },
     "rawRecordCount": 68,
-    "fieldCount": 77
+    "fieldCount": 77,
+    "sourceCounts": {
+      "pdfplumber": 56,
+      "text": 11,
+      "range+text": 10
+    }
   },
   {
     "masterId": "shika_shinryoukoui_イ",
@@ -96,7 +126,11 @@
       "end": 63
     },
     "rawRecordCount": 10,
-    "fieldCount": 10
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 7,
+      "text": 3
+    }
   },
   {
     "masterId": "shika_shinryoukoui_ウ",
@@ -107,7 +141,11 @@
       "end": 64
     },
     "rawRecordCount": 10,
-    "fieldCount": 10
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 7,
+      "text": 3
+    }
   },
   {
     "masterId": "shika_shinryoukoui_エ",
@@ -118,7 +156,11 @@
       "end": 65
     },
     "rawRecordCount": 10,
-    "fieldCount": 10
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 7,
+      "text": 3
+    }
   },
   {
     "masterId": "shika_shinryoukoui_オ",
@@ -129,7 +171,11 @@
       "end": 66
     },
     "rawRecordCount": 10,
-    "fieldCount": 10
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 7,
+      "text": 3
+    }
   },
   {
     "masterId": "shika_shinryoukoui_カ",
@@ -140,7 +186,10 @@
       "end": 67
     },
     "rawRecordCount": 13,
-    "fieldCount": 15
+    "fieldCount": 15,
+    "sourceCounts": {
+      "pdfplumber": 15
+    }
   },
   {
     "masterId": "shika_shinryoukoui_キ",
@@ -151,7 +200,11 @@
       "end": 70
     },
     "rawRecordCount": 18,
-    "fieldCount": 20
+    "fieldCount": 20,
+    "sourceCounts": {
+      "pdfplumber": 19,
+      "text": 1
+    }
   },
   {
     "masterId": "shika_shinryoukoui_ク",
@@ -162,7 +215,10 @@
       "end": 72
     },
     "rawRecordCount": 12,
-    "fieldCount": 14
+    "fieldCount": 14,
+    "sourceCounts": {
+      "pdfplumber": 14
+    }
   },
   {
     "masterId": "shika_shinryoukoui_ケ",
@@ -173,7 +229,11 @@
       "end": 74
     },
     "rawRecordCount": 15,
-    "fieldCount": 14
+    "fieldCount": 104,
+    "sourceCounts": {
+      "pdfplumber": 14,
+      "range+text-subs": 90
+    }
   },
   {
     "masterId": "shika_shinryoukoui_コ",
@@ -184,7 +244,11 @@
       "end": 76
     },
     "rawRecordCount": 12,
-    "fieldCount": 14
+    "fieldCount": 14,
+    "sourceCounts": {
+      "pdfplumber": 13,
+      "text": 1
+    }
   },
   {
     "masterId": "chouzai_koui",
@@ -195,7 +259,11 @@
       "end": 83
     },
     "rawRecordCount": 49,
-    "fieldCount": 77
+    "fieldCount": 77,
+    "sourceCounts": {
+      "pdfplumber": 68,
+      "text": 9
+    }
   },
   {
     "masterId": "houmon_kango",
@@ -203,9 +271,71 @@
     "subName": null,
     "pages": {
       "start": 84,
+      "end": 90
+    },
+    "rawRecordCount": 43,
+    "fieldCount": 86,
+    "sourceCounts": {
+      "pdfplumber": 69,
+      "text": 17
+    }
+  },
+  {
+    "masterId": "houmon_kango_イ",
+    "masterName": "訪問看護療養費マスター",
+    "subName": "基本・基本加算対応テーブル",
+    "pages": {
+      "start": 91,
+      "end": 91
+    },
+    "rawRecordCount": 7,
+    "fieldCount": 11,
+    "sourceCounts": {
+      "pdfplumber": 9,
+      "text": 2
+    }
+  },
+  {
+    "masterId": "houmon_kango_ウ",
+    "masterName": "訪問看護療養費マスター",
+    "subName": "算定回数限度テーブル",
+    "pages": {
+      "start": 92,
+      "end": 92
+    },
+    "rawRecordCount": 8,
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 10
+    }
+  },
+  {
+    "masterId": "houmon_kango_エ",
+    "masterName": "訪問看護療養費マスター",
+    "subName": "併算定背反テーブル",
+    "pages": {
+      "start": 93,
+      "end": 94
+    },
+    "rawRecordCount": 8,
+    "fieldCount": 13,
+    "sourceCounts": {
+      "pdfplumber": 8,
+      "text": 5
+    }
+  },
+  {
+    "masterId": "houmon_kango_オ",
+    "masterName": "訪問看護療養費マスター",
+    "subName": "施設基準テーブル",
+    "pages": {
+      "start": 95,
       "end": 95
     },
-    "rawRecordCount": 75,
-    "fieldCount": 118
+    "rawRecordCount": 9,
+    "fieldCount": 9,
+    "sourceCounts": {
+      "pdfplumber": 9
+    }
   }
 ]

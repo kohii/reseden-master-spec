@@ -384,8 +384,7 @@
       "mode": "numeric",
       "maxBytes": 2,
       "itemFormat": "可変",
-      "description": "別表番号の詳細は「別紙５－２」のとおりである。",
-      "_source": "text"
+      "description": "別表番号の詳細は「別紙５－２」のとおりである。"
     },
     {
       "seq": 32,

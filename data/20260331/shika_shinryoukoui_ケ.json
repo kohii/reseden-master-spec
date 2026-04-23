@@ -110,6 +110,735 @@
       "description": "加算項目ごとに重複しないコードを設定する。\n加算コードの構成は、「別紙８」の３のとおりである。\n項番２「歯科診療行為コード」と背反関係にある診療行為\nの名称を設定する。\n漢字：１００文字\n歯科点数表等に基づく診療行為名称を設定する。\n漢字：３２文字\n出力紙レセプト等に出力する名称（省略名称）を設定する。"
     },
     {
+      "seq": 10,
+      "name": "背反1/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "項番２「歯科診療行為コード」に対する算定可否を表す。\n０：算定不可\n１：算定可\n２：どちらか一方算定可"
+    },
+    {
+      "seq": 11,
+      "name": "背反1/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定",
+      "description": "項番２「歯科診療行為コード」と背反関係にある歯科診療\n告示番号                       歯科点数表に規定する診療行為の区分番号及び項番（「Ａ\n０００」等）を設定する。"
+    },
+    {
+      "seq": 12,
+      "name": "背反1/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "区分番号のアルファベット部を設定する。"
+    },
+    {
+      "seq": 13,
+      "name": "背反1/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定",
+      "description": "区分番号（アルファベット部を除く。）を設定する。"
+    },
+    {
+      "seq": 14,
+      "name": "背反1/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定",
+      "description": "区分番号の枝番を設定する。"
+    },
+    {
+      "seq": 15,
+      "name": "背反1/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定",
+      "description": "項番を設定する。"
+    },
+    {
+      "seq": 16,
+      "name": "背反1/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定",
+      "description": "加算項目ごとに重複しないコードを設定する。\n加算コードの構成は、「別紙８」の３のとおりである。\n診療行為名称                      項番２「歯科診療行為コード」と背反関係にある診療行為"
+    },
+    {
+      "seq": 17,
+      "name": "背反1/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変",
+      "description": "漢字：１００文字\n歯科点数表等に基づく診療行為名称を設定する。"
+    },
+    {
+      "seq": 18,
+      "name": "背反1/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変",
+      "description": "漢字：３２文字\n出力紙レセプト等に出力する名称（省略名称）を設定する。"
+    },
+    {
+      "seq": 19,
+      "name": "背反2/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 20,
+      "name": "背反2/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 21,
+      "name": "背反2/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 22,
+      "name": "背反2/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 23,
+      "name": "背反2/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 24,
+      "name": "背反2/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 25,
+      "name": "背反2/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 26,
+      "name": "背反2/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 27,
+      "name": "背反2/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 28,
+      "name": "背反3/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 29,
+      "name": "背反3/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 30,
+      "name": "背反3/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 31,
+      "name": "背反3/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 32,
+      "name": "背反3/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 33,
+      "name": "背反3/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 34,
+      "name": "背反3/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 35,
+      "name": "背反3/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 36,
+      "name": "背反3/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 37,
+      "name": "背反4/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 38,
+      "name": "背反4/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 39,
+      "name": "背反4/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 40,
+      "name": "背反4/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 41,
+      "name": "背反4/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 42,
+      "name": "背反4/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 43,
+      "name": "背反4/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 44,
+      "name": "背反4/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 45,
+      "name": "背反4/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 46,
+      "name": "背反5/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 47,
+      "name": "背反5/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 48,
+      "name": "背反5/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 49,
+      "name": "背反5/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 50,
+      "name": "背反5/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 51,
+      "name": "背反5/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 52,
+      "name": "背反5/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 53,
+      "name": "背反5/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 54,
+      "name": "背反5/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 55,
+      "name": "背反6/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 56,
+      "name": "背反6/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 57,
+      "name": "背反6/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 58,
+      "name": "背反6/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 59,
+      "name": "背反6/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 60,
+      "name": "背反6/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 61,
+      "name": "背反6/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 62,
+      "name": "背反6/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 63,
+      "name": "背反6/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 64,
+      "name": "背反7/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 65,
+      "name": "背反7/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 66,
+      "name": "背反7/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 67,
+      "name": "背反7/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 68,
+      "name": "背反7/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 69,
+      "name": "背反7/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 70,
+      "name": "背反7/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 71,
+      "name": "背反7/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 72,
+      "name": "背反7/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 73,
+      "name": "背反8/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 74,
+      "name": "背反8/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 75,
+      "name": "背反8/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 76,
+      "name": "背反8/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 77,
+      "name": "背反8/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 78,
+      "name": "背反8/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 79,
+      "name": "背反8/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 80,
+      "name": "背反8/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 81,
+      "name": "背反8/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 82,
+      "name": "背反9/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 83,
+      "name": "背反9/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 84,
+      "name": "背反9/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 85,
+      "name": "背反9/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 86,
+      "name": "背反9/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 87,
+      "name": "背反9/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 88,
+      "name": "背反9/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 89,
+      "name": "背反9/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 90,
+      "name": "背反9/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 91,
+      "name": "背反10/算定可否",
+      "shortName": "算定可否",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 92,
+      "name": "背反10/歯科診療行為コード",
+      "shortName": "歯科診療行為コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 93,
+      "name": "背反10/区分",
+      "shortName": "区分",
+      "mode": "alphanumeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 94,
+      "name": "背反10/区分番号",
+      "shortName": "区分番号",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 95,
+      "name": "背反10/枝番",
+      "shortName": "枝番",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 96,
+      "name": "背反10/項番",
+      "shortName": "項番",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 97,
+      "name": "背反10/加算コード",
+      "shortName": "加算コード",
+      "mode": "alphanumeric",
+      "maxBytes": 5,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 98,
+      "name": "背反10/基本名称",
+      "shortName": "基本名称",
+      "mode": "text",
+      "maxBytes": 200,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 99,
+      "name": "背反10/省略名称",
+      "shortName": "省略名称",
+      "mode": "text",
+      "maxBytes": 64,
+      "itemFormat": "可変"
+    },
+    {
       "seq": 100,
       "name": "変更年月日",
       "mode": "numeric",

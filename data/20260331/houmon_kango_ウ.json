@@ -1,0 +1,129 @@
+{
+  "masterId": "houmon_kango_ウ",
+  "masterName": "訪問看護療養費マスター",
+  "subName": "算定回数限度テーブル",
+  "version": "20260331",
+  "pages": {
+    "start": 92,
+    "end": 92
+  },
+  "fields": [
+    {
+      "seq": 1,
+      "name": "変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "マスター内容の異動状況を表す。\n０：前マスターの内容と同じであることを表す。\n１：抹消\n２：復活\n３：新規\n５：変更\n９：廃止\n「９：廃止」は、当該コードが使用できなくなったことを表\nす。\n次回のマスター更新時に、当該コードを削除する。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "前マスターの内容と同じであることを表す。"
+        },
+        {
+          "code": "1",
+          "name": "抹消"
+        },
+        {
+          "code": "2",
+          "name": "復活"
+        },
+        {
+          "code": "3",
+          "name": "新規"
+        },
+        {
+          "code": "5",
+          "name": "変更"
+        },
+        {
+          "code": "9",
+          "name": "廃止"
+        }
+      ]
+    },
+    {
+      "seq": 2,
+      "name": "訪問看護療養費コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定",
+      "description": "基本テーブルに対応した訪問看護療養費コードを設定する。"
+    },
+    {
+      "seq": 3,
+      "name": "省略名称",
+      "mode": "text",
+      "maxBytes": 128,
+      "itemFormat": "可変",
+      "description": "漢字：６４文字\n訪問看護療養費名称の省略名称を設定する。"
+    },
+    {
+      "seq": 4,
+      "name": "上限回数/算定単位",
+      "shortName": "算定単位",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "単位コード一覧の値を設定する。\n漢字：６文字\n算定単位名称を設定する。\n当該訪問看護療養費の算定可能な回数を表す。\nなお、算定回数に制限がない場合は「０」を設定する。\n当該訪問看護療養費の算定回数が、上限回数を超えた場合\nの処理を表す。\n０：上限回数を確認する。\n１：上限回数を算定する。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "上限回数を確認する。"
+        },
+        {
+          "code": "1",
+          "name": "上限回数を算定する。"
+        }
+      ]
+    },
+    {
+      "seq": 5,
+      "name": "上限回数/算定単位名称",
+      "shortName": "算定単位名称",
+      "mode": "text",
+      "maxBytes": 12,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 6,
+      "name": "上限回数/上限回数",
+      "shortName": "上限回数",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 7,
+      "name": "上限回数/上限回数エラー処理",
+      "shortName": "上限回数エラー処理",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 8,
+      "name": "変更年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該訪問看護療養費の情報に変更等が生じた場合、適用と\nなる日付を西暦年「４桁」、月「２桁」及び日「２桁」の８\n桁で表す。"
+    },
+    {
+      "seq": 9,
+      "name": "廃止年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該訪問看護療養費の使用が可能な最終日付を西暦年「４\n桁」、月「２桁」及び日「２桁」の８桁で表す。\nなお、廃止した訪問看護療養費コード以外は\n「９９９９９９９９」を設定する。"
+    },
+    {
+      "seq": 10,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "未使用：「０」を設定する。"
+    }
+  ]
+}

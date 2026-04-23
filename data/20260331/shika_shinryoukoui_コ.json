@@ -144,8 +144,7 @@
       "mode": "numeric",
       "maxBytes": 1,
       "itemFormat": "固定",
-      "description": "項番１０「実日数」の細分化する情報を、下表に基づき設定す\nる。",
-      "_source": "text"
+      "description": "項番１０「実日数」の細分化する情報を、下表に基づき設定す\nる。"
     },
     {
       "seq": 12,

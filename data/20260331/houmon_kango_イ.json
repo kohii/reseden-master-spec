@@ -1,0 +1,127 @@
+{
+  "masterId": "houmon_kango_イ",
+  "masterName": "訪問看護療養費マスター",
+  "subName": "基本・基本加算対応テーブル",
+  "version": "20260331",
+  "pages": {
+    "start": 91,
+    "end": 91
+  },
+  "fields": [
+    {
+      "seq": 1,
+      "name": "変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "マスター内容の異動状況を表す。\n０：前マスターの内容と同じであることを表す。\n１：抹消\n２：復活\n３：新規\n５：変更\n９：廃止\n「９：廃止」は、当該コードが使用できなくなったことを表\nす。\n次回のマスター更新時に、当該コードを削除する。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "前マスターの内容と同じであることを表す。"
+        },
+        {
+          "code": "1",
+          "name": "抹消"
+        },
+        {
+          "code": "2",
+          "name": "復活"
+        },
+        {
+          "code": "3",
+          "name": "新規"
+        },
+        {
+          "code": "5",
+          "name": "変更"
+        },
+        {
+          "code": "9",
+          "name": "廃止"
+        }
+      ]
+    },
+    {
+      "seq": 2,
+      "name": "グループ番号",
+      "mode": "alphanumeric",
+      "maxBytes": 4,
+      "itemFormat": "固定",
+      "description": "基本テーブルの項番４８「加算グループ」に設定したコード\nを表す。"
+    },
+    {
+      "seq": 3,
+      "name": "加算項目/訪問看護療養費コー",
+      "shortName": "訪問看護療養費コー",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定",
+      "description": "項番２「グループ番号」に対応する訪問看護療養費に加算\n可能な訪問看護療養費コードを設定する。\n漢字：６４文字\n項番２「グループ番号」に対応する訪問看護療養費に加算\n可能な訪問看護療養費名称の省略名称を設定する。\n項番２「グループ番号」の同一コード内で、併算定が可能\nな訪問看護療養費を単位ごとに識別コードを設定する。"
+    },
+    {
+      "seq": 3,
+      "name": "加算項目/ド",
+      "shortName": "ド",
+      "mode": "text",
+      "maxBytes": 128,
+      "itemFormat": "可変"
+    },
+    {
+      "seq": 3,
+      "name": "加算項目/省略名称",
+      "shortName": "省略名称",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 3,
+      "name": "加算項目/加算識別",
+      "shortName": "加算識別",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定"
+    },
+    {
+      "seq": 4,
+      "name": "省略名称",
+      "mode": "text",
+      "maxBytes": 128,
+      "itemFormat": "可変",
+      "description": "漢字：６４文字\n項番２「グループ番号」に対応する訪問看護療養費に加算\n可能な訪問看護療養費名称の省略名称を設定する。"
+    },
+    {
+      "seq": 5,
+      "name": "加算識別",
+      "mode": "numeric",
+      "maxBytes": 2,
+      "itemFormat": "固定",
+      "description": "項番２「グループ番号」の同一コード内で、併算定が可能\nな訪問看護療養費を単位ごとに識別コードを設定する。"
+    },
+    {
+      "seq": 6,
+      "name": "変更年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該訪問看護療養費の情報に変更等が生じた場合、適用と\nなる日付を西暦年「４桁」、月「２桁」及び日「２桁」の８\n桁で表す。"
+    },
+    {
+      "seq": 7,
+      "name": "廃止年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該訪問看護療養費の使用が可能な最終日付を西暦年「４\n桁」、月「２桁」及び日「２桁」の８桁で表す。\nなお、廃止した訪問看護療養費コード以外は「９９９９９\n９９９」を設定する。"
+    },
+    {
+      "seq": 8,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "未使用：「０」を設定する。"
+    }
+  ]
+}

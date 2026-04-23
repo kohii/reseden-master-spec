@@ -1,0 +1,142 @@
+{
+  "masterId": "houmon_kango_エ",
+  "masterName": "訪問看護療養費マスター",
+  "subName": "併算定背反テーブル",
+  "version": "20260331",
+  "pages": {
+    "start": 93,
+    "end": 94
+  },
+  "fields": [
+    {
+      "seq": 1,
+      "name": "変更区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "マスター内容の異動状況を表す。\n０：前マスターの内容と同じであることを表す。\n１：抹消\n２：復活\n３：新規\n５：変更\n９：廃止\n「９：廃止」は、当該コードが使用できなくなったことを表\nす。\n次回のマスター更新時に、当該コードを削除する。",
+      "codes": [
+        {
+          "code": "0",
+          "name": "前マスターの内容と同じであることを表す。"
+        },
+        {
+          "code": "1",
+          "name": "抹消"
+        },
+        {
+          "code": "2",
+          "name": "復活"
+        },
+        {
+          "code": "3",
+          "name": "新規"
+        },
+        {
+          "code": "5",
+          "name": "変更"
+        },
+        {
+          "code": "9",
+          "name": "廃止"
+        }
+      ]
+    },
+    {
+      "seq": 2,
+      "name": "訪問看護療養費コード",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定",
+      "description": "基本テーブルに対応した訪問看護療養費コードを設定する。"
+    },
+    {
+      "seq": 3,
+      "name": "省略名称①",
+      "mode": "text",
+      "maxBytes": 128,
+      "itemFormat": "可変",
+      "description": "漢字：６４文字\n訪問看護療養費名称の省略名称を設定する。"
+    },
+    {
+      "seq": 4,
+      "name": "背反区分",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "背反の条件を表す。"
+    },
+    {
+      "seq": 5,
+      "name": "訪問看護療養費コー",
+      "mode": "numeric",
+      "maxBytes": 9,
+      "itemFormat": "固定",
+      "description": "項番２「訪問看護療養費コード」と背反関係にある訪問看\nド                           護療養費コードを設定する。"
+    },
+    {
+      "seq": 6,
+      "name": "省略名称②",
+      "mode": "text",
+      "maxBytes": 128,
+      "itemFormat": "可変",
+      "description": "漢字：６４文字\n項番２「訪問看護療養費コード」と背反関係にある訪問看\n護療養費名称の省略名称を設定する。"
+    },
+    {
+      "seq": 7,
+      "name": "背反単位",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "項番２と項番５の「訪問看護療養費コード」が背反となる\n単位を設定する。"
+    },
+    {
+      "seq": 8,
+      "name": "特例条件",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "背反条件に特別な条件がある場合に設定する。"
+    },
+    {
+      "seq": 9,
+      "name": "変更年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該訪問看護療養費の情報に変更等が生じた場合、適用とな\nる日付を西暦年「４桁」、月「２桁」及び日「２桁」の８桁\nで表す。"
+    },
+    {
+      "seq": 10,
+      "name": "廃止年月日",
+      "mode": "numeric",
+      "maxBytes": 8,
+      "itemFormat": "固定",
+      "description": "当該訪問看護療養費の使用が可能な最終日付を西暦年「４\n桁」、月「２桁」及び日「２桁」の８桁で表す。\nなお、廃止した訪問看護療養費コード以外は「９９９９９\n９９９」を設定する。"
+    },
+    {
+      "seq": 11,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "未使用：「０」を設定する。"
+    },
+    {
+      "seq": 12,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "未使用：「０」を設定する。"
+    },
+    {
+      "seq": 13,
+      "name": "予備",
+      "mode": "numeric",
+      "maxBytes": 3,
+      "itemFormat": "可変",
+      "description": "未使用：「０」を設定する。"
+    }
+  ]
+}

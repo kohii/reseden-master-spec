@@ -241,8 +241,7 @@
       "mode": "numeric",
       "maxBytes": 1,
       "itemFormat": "固定",
-      "description": "きざみ値により計算を行う調剤行為であるか否かを表\nす。",
-      "_source": "text"
+      "description": "きざみ値により計算を行う調剤行為であるか否かを表\nす。"
     },
     {
       "seq": 14,
@@ -250,8 +249,7 @@
       "mode": "numeric",
       "maxBytes": 3,
       "itemFormat": "固定",
-      "description": "調剤数量の下限値を表す。\n下限値に制限がない場合は「０００」を設定する。",
-      "_source": "text"
+      "description": "調剤数量の下限値を表す。\n下限値に制限がない場合は「０００」を設定する。"
     },
     {
       "seq": 15,
@@ -259,8 +257,7 @@
       "mode": "numeric",
       "maxBytes": 3,
       "itemFormat": "固定",
-      "description": "調剤数量の上限値を表す。\n上限値に制限がない場合は「９９９」を設定する。",
-      "_source": "text"
+      "description": "調剤数量の上限値を表す。\n上限値に制限がない場合は「９９９」を設定する。"
     },
     {
       "seq": 16,
@@ -268,8 +265,7 @@
       "mode": "numeric",
       "maxBytes": 3,
       "itemFormat": "可変",
-      "description": "項番１７「きざみ点数」を適用する単位を表す。",
-      "_source": "text"
+      "description": "項番１７「きざみ点数」を適用する単位を表す。"
     },
     {
       "seq": 17,
@@ -277,8 +273,7 @@
       "mode": "numeric",
       "maxBytes": 9,
       "itemFormat": "可変",
-      "description": "下２桁を小数点以下とする９桁の数字で設定する。",
-      "_source": "text"
+      "description": "下２桁を小数点以下とする９桁の数字で設定する。"
     },
     {
       "seq": 18,
@@ -286,8 +281,7 @@
       "mode": "numeric",
       "maxBytes": 1,
       "itemFormat": "固定",
-      "description": "「０」を設定し、調剤数量と項番１４「下限値」及び項\n番１５「上限値」の値に応じた点数計算を行う。",
-      "_source": "text"
+      "description": "「０」を設定し、調剤数量と項番１４「下限値」及び項\n番１５「上限値」の値に応じた点数計算を行う。"
     },
     {
       "seq": 19,
@@ -781,8 +775,7 @@
           "code": "2",
           "name": "上限回数を確認する。"
         }
-      ],
-      "_source": "text"
+      ]
     },
     {
       "seq": 49,
@@ -825,8 +818,7 @@
       "mode": "numeric",
       "maxBytes": 1,
       "itemFormat": "固定",
-      "description": "当該調剤行為の算定回数が、上限回数を超えた場合の処\n理                           理を表す。",
-      "_source": "text"
+      "description": "当該調剤行為の算定回数が、上限回数を超えた場合の処\n理                           理を表す。"
     },
     {
       "seq": 51,
@@ -851,8 +843,7 @@
       "mode": "alphanumeric",
       "maxBytes": 2,
       "itemFormat": "固定",
-      "description": "当該調剤行為を算定可能な年齢の下限値を表す。",
-      "_source": "text"
+      "description": "当該調剤行為を算定可能な年齢の下限値を表す。"
     },
     {
       "seq": 54,

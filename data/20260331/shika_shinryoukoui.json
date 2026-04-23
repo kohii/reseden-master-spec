@@ -127,8 +127,7 @@
       "mode": "numeric",
       "maxBytes": 1,
       "itemFormat": "固定",
-      "description": "項番１２「点数等」に設定した点数等の種別を表す。",
-      "_source": "text"
+      "description": "項番１２「点数等」に設定した点数等の種別を表す。"
     },
     {
       "seq": 12,
@@ -580,8 +579,7 @@
       "mode": "numeric",
       "maxBytes": 2,
       "itemFormat": "可変",
-      "description": "検査及び画像診断等の判断料又は診断料を算定できる診療\nプ区分                        行為のグループ区分を表す。",
-      "_source": "text"
+      "description": "検査及び画像診断等の判断料又は診断料を算定できる診療\nプ区分                        行為のグループ区分を表す。"
     },
     {
       "seq": 32,
@@ -655,8 +653,7 @@
       "mode": "numeric",
       "maxBytes": 4,
       "itemFormat": "可変",
-      "description": "施設基準を要する診療行為であるか否かを表す。\n施設基準コードは「別紙７－８」のとおりである。",
-      "_source": "range+text"
+      "description": "施設基準を要する診療行為であるか否かを表す。\n施設基準コードは「別紙７－８」のとおりである。"
     },
     {
       "seq": 37,
@@ -664,8 +661,7 @@
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
-      "itemFormat": "可変",
-      "_source": "range+text"
+      "itemFormat": "可変"
     },
     {
       "seq": 38,
@@ -673,8 +669,7 @@
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
-      "itemFormat": "可変",
-      "_source": "range+text"
+      "itemFormat": "可変"
     },
     {
       "seq": 39,
@@ -682,8 +677,7 @@
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
-      "itemFormat": "可変",
-      "_source": "range+text"
+      "itemFormat": "可変"
     },
     {
       "seq": 40,
@@ -691,8 +685,7 @@
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
-      "itemFormat": "可変",
-      "_source": "range+text"
+      "itemFormat": "可変"
     },
     {
       "seq": 41,
@@ -700,8 +693,7 @@
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
-      "itemFormat": "可変",
-      "_source": "range+text"
+      "itemFormat": "可変"
     },
     {
       "seq": 42,
@@ -709,8 +701,7 @@
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
-      "itemFormat": "可変",
-      "_source": "range+text"
+      "itemFormat": "可変"
     },
     {
       "seq": 43,
@@ -718,8 +709,7 @@
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
-      "itemFormat": "可変",
-      "_source": "range+text"
+      "itemFormat": "可変"
     },
     {
       "seq": 44,
@@ -727,8 +717,7 @@
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
-      "itemFormat": "可変",
-      "_source": "range+text"
+      "itemFormat": "可変"
     },
     {
       "seq": 45,
@@ -736,8 +725,7 @@
       "shortName": "施設基準コード",
       "mode": "numeric",
       "maxBytes": 4,
-      "itemFormat": "可変",
-      "_source": "range+text"
+      "itemFormat": "可変"
     },
     {
       "seq": 46,
@@ -745,8 +733,7 @@
       "mode": "alphanumeric",
       "maxBytes": 4,
       "itemFormat": "固定",
-      "description": "基本・通則加算対応テーブルの参照先グループ番号を表\nす。",
-      "_source": "text"
+      "description": "基本・通則加算対応テーブルの参照先グループ番号を表\nす。"
     },
     {
       "seq": 47,
@@ -754,8 +741,7 @@
       "mode": "alphanumeric",
       "maxBytes": 4,
       "itemFormat": "固定",
-      "description": "基本・基本加算対応テーブルの参照先グループ番号を表\nす。",
-      "_source": "text"
+      "description": "基本・基本加算対応テーブルの参照先グループ番号を表\nす。"
     },
     {
       "seq": 48,
@@ -763,8 +749,7 @@
       "mode": "alphanumeric",
       "maxBytes": 4,
       "itemFormat": "固定",
-      "description": "基本・注加算対応テーブルの参照先グループ番号を表す。",
-      "_source": "text"
+      "description": "基本・注加算対応テーブルの参照先グループ番号を表す。"
     },
     {
       "seq": 49,
@@ -772,8 +757,7 @@
       "mode": "alphanumeric",
       "maxBytes": 4,
       "itemFormat": "固定",
-      "description": "手技・材料加算対応テーブルの参照先グループ番号を表\nプ                          す。",
-      "_source": "text"
+      "description": "手技・材料加算対応テーブルの参照先グループ番号を表\nプ                          す。"
     },
     {
       "seq": 50,
@@ -791,8 +775,7 @@
           "code": "1",
           "name": "関連あり"
         }
-      ],
-      "_source": "text"
+      ]
     },
     {
       "seq": 51,
@@ -814,8 +797,7 @@
           "code": "2",
           "name": "関連あり（診療行為数量データ１、２の記録が必要）"
         }
-      ],
-      "_source": "text"
+      ]
     },
     {
       "seq": 52,
@@ -833,8 +815,7 @@
           "code": "1",
           "name": "関連あり"
         }
-      ],
-      "_source": "text"
+      ]
     },
     {
       "seq": 53,
@@ -852,8 +833,7 @@
           "code": "1",
           "name": "関連あり"
         }
-      ],
-      "_source": "text"
+      ]
     },
     {
       "seq": 54,
@@ -861,8 +841,7 @@
       "mode": "numeric",
       "maxBytes": 1,
       "itemFormat": "固定",
-      "description": "実日数テーブルとの関連の有無を表す。\n別",
-      "_source": "text"
+      "description": "実日数テーブルとの関連の有無を表す。\n別"
     },
     {
       "seq": 55,

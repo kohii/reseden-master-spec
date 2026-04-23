@@ -1,6 +1,14 @@
 {
   "version": "20260331",
   "sourcePdf": "master_1_20260331.pdf",
+  "sourceUrl": null,
+  "sourceSha256": "d75dbc50af304e08101f602e8489df0a73fd4e21a1ed6cea965d697212aff464",
+  "extractorVersion": "0.1.0",
+  "extractedAt": "2026-04-23T21:50:37Z",
+  "dependencies": {
+    "pdfplumber": "0.11.9",
+    "pdftotext": "pdftotext version 26.02.0"
+  },
   "masters": [
     {
       "masterId": "shoubyomei",
@@ -176,7 +184,7 @@
         "end": 74
       },
       "file": "shika_shinryoukoui_ケ.json",
-      "fieldCount": 14
+      "fieldCount": 104
     },
     {
       "masterId": "shika_shinryoukoui_コ",
@@ -206,10 +214,54 @@
       "subName": null,
       "pages": {
         "start": 84,
-        "end": 95
+        "end": 90
       },
       "file": "houmon_kango.json",
-      "fieldCount": 118
+      "fieldCount": 86
+    },
+    {
+      "masterId": "houmon_kango_イ",
+      "masterName": "訪問看護療養費マスター",
+      "subName": "基本・基本加算対応テーブル",
+      "pages": {
+        "start": 91,
+        "end": 91
+      },
+      "file": "houmon_kango_イ.json",
+      "fieldCount": 11
+    },
+    {
+      "masterId": "houmon_kango_ウ",
+      "masterName": "訪問看護療養費マスター",
+      "subName": "算定回数限度テーブル",
+      "pages": {
+        "start": 92,
+        "end": 92
+      },
+      "file": "houmon_kango_ウ.json",
+      "fieldCount": 10
+    },
+    {
+      "masterId": "houmon_kango_エ",
+      "masterName": "訪問看護療養費マスター",
+      "subName": "併算定背反テーブル",
+      "pages": {
+        "start": 93,
+        "end": 94
+      },
+      "file": "houmon_kango_エ.json",
+      "fieldCount": 13
+    },
+    {
+      "masterId": "houmon_kango_オ",
+      "masterName": "訪問看護療養費マスター",
+      "subName": "施設基準テーブル",
+      "pages": {
+        "start": 95,
+        "end": 95
+      },
+      "file": "houmon_kango_オ.json",
+      "fieldCount": 9
     }
   ]
 }
