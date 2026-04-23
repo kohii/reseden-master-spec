@@ -670,6 +670,15 @@ def _detect_missing_seqs(fields: list[dict[str, Any]]) -> set[int]:
     return set(range(seqs[0], seqs[-1] + 1)) - set(seqs)
 
 
+def _detect_defective_seqs(fields: list[dict[str, Any]]) -> set[int]:
+    """補完したい seq 集合: 欠落 seq + name が空の seq"""
+    defective = _detect_missing_seqs(fields)
+    for f in fields:
+        if not f.get("name"):
+            defective.add(f["seq"])
+    return defective
+
+
 def _to_field_entry(rec: dict[str, Any]) -> dict[str, Any]:
     """text_supplement由来のrawレコードを medi-xplorer互換 field entry に変換する。"""
     mode = MODE_MAP.get(rec["mode_raw"], rec["mode_raw"]) or None
@@ -711,17 +720,23 @@ def extract_master(
             raw.append(rec)
     normalized = normalize_records(raw)
 
-    # 欠落 seq を pdftotext で補完
+    # 欠落 / name空 の seq を pdftotext で補完
     if pdf_path is not None and normalized:
-        missing = _detect_missing_seqs(normalized)
-        if missing:
+        defective = _detect_defective_seqs(normalized)
+        if defective:
             supplemental = text_supplement.supplement_from_text(
-                pdf_path, section.start_page, section.end_page, missing
+                pdf_path, section.start_page, section.end_page, defective
             )
-            for rec in supplemental:
-                normalized.append(_to_field_entry(rec))
-            # seq 順にソート (同seq内は _source が pdfplumber由来を先に)
-            normalized.sort(key=lambda f: (f["seq"], f.get("_source") == "text"))
+            if supplemental:
+                supp_seqs = {r["seq"] for r in supplemental}
+                # 補完できた seq の name空フィールドを除去して置換
+                normalized = [
+                    f for f in normalized if not (f["seq"] in supp_seqs and not f.get("name"))
+                ]
+                for rec in supplemental:
+                    normalized.append(_to_field_entry(rec))
+        # seq 順にソート (同seq内は pdfplumber由来を先に)
+        normalized.sort(key=lambda f: (f["seq"], f.get("_source") == "text"))
 
     return raw, normalized
 

@@ -710,7 +710,12 @@
     },
     {
       "seq": 24,
-      "name": ""
+      "name": "上下限エラー処理",
+      "mode": "numeric",
+      "maxBytes": 1,
+      "itemFormat": "固定",
+      "description": "当該訪問看護療養費の数量データが「下限値－きざみ値」\n以下又は「上限値」を超えた場合の処理を表す。",
+      "_source": "text"
     },
     {
       "seq": 25,
