@@ -96,6 +96,23 @@ reseden verify                    # 抽出結果の健全性チェック（exit 
 
 各サブコマンドの詳細と使用例は `reseden <cmd> --help`。
 
+### エージェントに使わせる
+
+`reseden skill` で同梱の SKILL.md を stdout に書き出せる。設置先はエージェントに合わせる。
+
+```bash
+# Claude Code
+mkdir -p ~/.claude/skills/reseden-master-spec
+reseden skill > ~/.claude/skills/reseden-master-spec/SKILL.md
+
+# Codex など（AGENTS.md ベースのもの）
+reseden skill >> AGENTS.md
+```
+
+SKILL.md は意図的に薄く書いてある（具体的な masterId や項番は載せない）。
+エージェントには「まず `reseden info` / `reseden schema` を叩け」とだけ伝え、
+具体の値は CLI から毎回引かせる方針。
+
 ### 更新・削除
 
 ```bash
