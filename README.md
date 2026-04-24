@@ -73,12 +73,15 @@ reseden-master-spec/
 # 最新（main）の同梱データを使って実行
 uvx --from 'git+https://github.com/kohii/reseden-master-spec' reseden masters
 
-# 特定の改定版に固定（タグ名でピン留め）
-uvx --from 'git+https://github.com/kohii/reseden-master-spec@20260331' reseden field iyakuhin 14
+# 特定のツールリリースに固定（semver タグでピン留め）
+uvx --from 'git+https://github.com/kohii/reseden-master-spec@v0.1.0' reseden field iyakuhin 14
 
 # タグが未付与なら commit SHA でも可
 uvx --from 'git+https://github.com/kohii/reseden-master-spec@<sha>' reseden masters
 ```
+
+- tag は **semver (`vX.Y.Z`)** で付与する。PDF の改定とツール改修の両方をリリース契機にできるため。
+- 同梱される PDF 版は `reseden masters`（`version` フィールド）または `manifest.json` で確認できる。
 
 配布版で使えるサブコマンド:
 
@@ -205,9 +208,10 @@ uv run python -m reseden_master_spec.extract data/raw/master_1_20260331.pdf data
 - `text_supplement` は `pdftotext -layout` で pdfplumber の取りこぼしを補完する
   ハイブリッド層。pdfplumber → pdftotext 補完 → テンプレート fallback の 3 段構え。
 
-### 新しい版の配布
+### 新しいバージョンの公開
 
-1. 新PDF を `uv run reseden fetch <URL>` で取得・抽出し `data/<YYYYMMDD>/` にコミット。
+1. 変更をコミット（PDF改定なら `uv run reseden fetch <URL>` で `data/<YYYYMMDD>/` を更新してコミット、ツール改修ならコードを修正してコミット）。
 2. `uv run reseden verify` が `ok: true` で通ることを確認。
-3. 版の日付をタグとして push: `git tag 20270331 && git push --tags`。
-4. 利用者は `uvx --from 'git+https://github.com/kohii/reseden-master-spec@20270331' reseden masters` で参照可能になる。
+3. `pyproject.toml` と `src/reseden_master_spec/__init__.py` の `version` / `__version__` を semver で bump してコミット。
+4. `git tag vX.Y.Z && git push --tags` でタグを打つ。
+5. 利用者は `uvx --from 'git+https://github.com/kohii/reseden-master-spec@vX.Y.Z' reseden masters` で参照可能。

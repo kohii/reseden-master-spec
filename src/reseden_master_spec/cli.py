@@ -396,7 +396,14 @@ def cmd_search(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    from . import __version__ as _pkg_version
+
     p = argparse.ArgumentParser(prog="reseden", description=__doc__)
+    p.add_argument(
+        "--version",
+        action="version",
+        version=f"reseden-master-spec {_pkg_version}",
+    )
     p.add_argument(
         "--out-dir",
         help="Data directory (default: ./data)",
