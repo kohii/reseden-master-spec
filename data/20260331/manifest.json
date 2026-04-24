@@ -4,7 +4,7 @@
   "sourceUrl": null,
   "sourceSha256": "d75dbc50af304e08101f602e8489df0a73fd4e21a1ed6cea965d697212aff464",
   "extractorVersion": "0.1.0",
-  "extractedAt": "2026-04-23T21:50:37Z",
+  "extractedAt": "2026-04-24T00:58:10Z",
   "dependencies": {
     "pdfplumber": "0.11.9",
     "pdftotext": "pdftotext version 26.02.0"

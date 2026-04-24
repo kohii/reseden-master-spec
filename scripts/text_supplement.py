@@ -36,6 +36,12 @@ _MODE_AT_RE = re.compile(
 
 _ZEN2HAN = str.maketrans("０１２３４５６７８９", "0123456789")
 _CIRCLED_DIGITS = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳"
+# 項目名がセル内で折返されて途中切れしている可能性がある末尾
+_TRUNCATED_NAME_SUFFIXES = ("グルー", "コ", "ロ", "プ", "判", "者", "ー", "グ")
+# 継続行の先頭に現れた「項目名の続き断片 + 2スペース以上 + description 本体」パターン
+_CONTINUATION_WITH_FRAG_RE = re.compile(r"^(?P<frag>\S{1,8})\s{2,}(?P<rest>\S.*)$")
+# 断片として許容する文字（漢字/ひらがな/カタカナ + 記号少々）
+_NAME_FRAG_CHARSET_RE = re.compile(r"^[぀-ヿ一-鿿・／／]+$")
 
 
 def _zh(s: str) -> str:
@@ -139,6 +145,18 @@ def parse_text_rows(lines: list[str]) -> list[dict[str, Any]]:
             continue
         # description 折返し: current に連結
         if current is not None:
+            # 項目名列の残余（例: "プ区分         行為の..."）を検出し、
+            # 先頭断片を name へ戻す。current.name が途中切れの suffix で終わる場合に限る。
+            if current.get("name", "").endswith(_TRUNCATED_NAME_SUFFIXES):
+                frag_m = _CONTINUATION_WITH_FRAG_RE.match(stripped)
+                if frag_m and _NAME_FRAG_CHARSET_RE.match(frag_m.group("frag")):
+                    current["name"] = current["name"] + frag_m.group("frag")
+                    rest = frag_m.group("rest").strip()
+                    if rest:
+                        current["content"] = (
+                            current["content"] + "\n" + rest
+                        ).strip()
+                    continue
             current["content"] = (current["content"] + "\n" + stripped).strip()
 
     return records
