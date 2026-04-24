@@ -3,6 +3,50 @@ name = "reseden-master-spec"
 version = "0.1.0"
 description = "診療報酬制度 基本マスターファイル仕様書PDFを構造化JSONに変換するツール"
 requires-python = ">=3.12"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "kohii" }]
 dependencies = [
     "pdfplumber>=0.11.9",
+]
+
+[project.urls]
+Homepage = "https://github.com/kohii/reseden-master-spec"
+Issues = "https://github.com/kohii/reseden-master-spec/issues"
+
+[project.scripts]
+reseden = "reseden_master_spec.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/reseden_master_spec"]
+
+# ルートの data/ ディレクトリをパッケージ内にマップして wheel に同梱する。
+# data/raw/ と debug ファイルは配布物から除外。
+[tool.hatch.build.targets.wheel.force-include]
+"data" = "reseden_master_spec/data"
+
+[tool.hatch.build]
+exclude = [
+    "data/raw",
+    "**/sections.debug.json",
+    ".kohii",
+    "tests",
+    "/tmp",
+]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/reseden_master_spec",
+    "data",
+    "README.md",
+    "pyproject.toml",
+]
+exclude = [
+    "data/raw",
+    "**/sections.debug.json",
+    ".kohii",
 ]

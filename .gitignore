@@ -4,3 +4,9 @@ __pycache__/
 
 # 生PDFはキャッシュなのでリポジトリには載せない（必要に応じて変更）
 data/raw/
+
+# ビルド成果物
+dist/
+build/
+*.egg-info/
+.kohii/

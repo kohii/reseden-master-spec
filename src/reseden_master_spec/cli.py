@@ -3,15 +3,20 @@
 URLからPDFを取得してJSON化するfetch、および抽出済みJSONを検索するクエリを提供する。
 
 Usage:
-    uv run scripts/cli.py fetch <url> [--out-dir DIR]
-    uv run scripts/cli.py versions [--out-dir DIR]
-    uv run scripts/cli.py masters [--version V] [--out-dir DIR]
-    uv run scripts/cli.py fields <master_id> [--version V] [--out-dir DIR]
-    uv run scripts/cli.py field <master_id> <seq> [--version V] [--out-dir DIR]
-    uv run scripts/cli.py code <master_id> <seq> <code> [--version V] [--out-dir DIR]
-    uv run scripts/cli.py search <keyword> [--master-id M] [--version V] [--out-dir DIR]
+    reseden fetch <url> [--out-dir DIR]
+    reseden versions [--out-dir DIR]
+    reseden masters [--version V] [--out-dir DIR]
+    reseden fields <master_id> [--version V] [--out-dir DIR]
+    reseden field <master_id> <seq> [--version V] [--out-dir DIR]
+    reseden code <master_id> <seq> <code> [--version V] [--out-dir DIR]
+    reseden search <keyword> [--master-id M] [--version V] [--out-dir DIR]
+    reseden verify [--version V] [--baseline V] [--out-dir DIR]
 
-デフォルトの --out-dir は "./data"。
+--out-dir 省略時のデータ解決順:
+  1. カレントディレクトリ直下の ./data に版があればそれ（開発環境）
+  2. パッケージに同梱された data/（配布環境）
+  3. 無ければ ./data（fetch など書き込み用途のデフォルト）
+
 --version を省略した場合は最新（ファイル名ソート順の最後）のバージョンを使う。
 """
 
@@ -21,14 +26,33 @@ import argparse
 import json
 import re
 import sys
+from importlib.resources import files as _pkg_files
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
-import extract as extractor
+from . import extract as extractor
 
-DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+def _packaged_data_dir() -> Path | None:
+    """パッケージに同梱された data/ ディレクトリのパスを返す。無ければ None。"""
+    try:
+        resource = _pkg_files("reseden_master_spec") / "data"
+        path = Path(str(resource))
+    except (ModuleNotFoundError, FileNotFoundError):
+        return None
+    return path if path.is_dir() else None
+
+
+def _resolve_default_data_dir() -> Path:
+    cwd_data = Path.cwd() / "data"
+    if cwd_data.is_dir() and any(cwd_data.glob("*/manifest.json")):
+        return cwd_data.resolve()
+    pkg = _packaged_data_dir()
+    if pkg is not None and any(pkg.glob("*/manifest.json")):
+        return pkg
+    return cwd_data
 
 
 # ---------------------------------------------------------------------------
@@ -37,7 +61,7 @@ DEFAULT_DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 
 def _data_dir(value: str | None) -> Path:
-    return Path(value).resolve() if value else DEFAULT_DATA_DIR
+    return Path(value).resolve() if value else _resolve_default_data_dir()
 
 
 _VERSION_NAME_RE = re.compile(r"^\d{8}$")
@@ -372,7 +396,7 @@ def cmd_search(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="kms", description=__doc__)
+    p = argparse.ArgumentParser(prog="reseden", description=__doc__)
     p.add_argument(
         "--out-dir",
         help="Data directory (default: ./data)",

@@ -1,7 +1,7 @@
 """PDFからマスター仕様のテーブルを抽出し、JSONに変換する。
 
 使い方:
-    uv run scripts/extract.py <pdf_path> <output_dir>
+    python -m reseden_master_spec.extract <pdf_path> <output_dir>
 
 出力:
     <output_dir>/
@@ -26,7 +26,7 @@ from typing import Any
 
 import pdfplumber
 
-import text_supplement
+from . import text_supplement
 
 EXTRACTOR_VERSION = "0.1.0"
 
