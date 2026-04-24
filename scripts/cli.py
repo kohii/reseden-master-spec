@@ -1,4 +1,4 @@
-"""kihon-master-spec CLI
+"""reseden-master-spec CLI
 
 URLからPDFを取得してJSON化するfetch、および抽出済みJSONを検索するクエリを提供する。
 
@@ -103,7 +103,7 @@ def cmd_fetch(args: argparse.Namespace) -> int:
     pdf_path = raw_dir / file_name
     if args.force or not pdf_path.exists():
         print(f"[fetch] downloading {url}", file=sys.stderr)
-        req = Request(url, headers={"User-Agent": "kihon-master-spec/0.1"})
+        req = Request(url, headers={"User-Agent": "reseden-master-spec/0.1"})
         with urlopen(req) as resp, pdf_path.open("wb") as f:
             f.write(resp.read())
     else:

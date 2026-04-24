@@ -186,7 +186,7 @@ wheels = [
 ]
 
 [[package]]
-name = "kihon-master-spec"
+name = "reseden-master-spec"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
