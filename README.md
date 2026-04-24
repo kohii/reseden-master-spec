@@ -67,27 +67,21 @@ reseden-master-spec/
 ## 使い方（配布版）
 
 抽出済みJSONの一覧・検索だけしたい利用者向け。ローカルに clone 不要。
-`uv` を事前にインストールしておく（[インストール手順](https://docs.astral.sh/uv/getting-started/installation/)）。
+事前に [uv](https://docs.astral.sh/uv/getting-started/installation/) が必要。
 
-### インストール（推奨）
-
-デフォルトでは **main の最新** を入れる。こうすることで README のコピペが古くならない。
+### インストール
 
 ```bash
-# グローバルに reseden コマンドを入れる
+# グローバルに reseden コマンドを入れる（main 追従）
 uv tool install 'git+https://github.com/kohii/reseden-master-spec'
 
 # 初回のみ、シェルに PATH を通す
 uv tool update-shell
 ```
 
-インストール済みバージョンの確認は `reseden --version`。
-利用可能なリリース一覧は [Releases](https://github.com/kohii/reseden-master-spec/releases) を参照。
+特定バージョンに固定したい場合は URL 末尾に `@vX.Y.Z` を付ける。
 
-> **特定バージョンに固定したい場合** は URL 末尾に `@vX.Y.Z` を付ける:
-> `uv tool install 'git+https://github.com/kohii/reseden-master-spec@vX.Y.Z'`
-
-インストール後はどこからでもコマンドが使える:
+### よく使うコマンド
 
 ```bash
 reseden info                      # 同梱データ版・マスター一覧・主要コマンドガイド
@@ -98,28 +92,26 @@ reseden code iyakuhin 14 3        # 項番14 のコード値 "3" を引く
 reseden search 後発品 --limit 10   # キーワード検索（どこでヒットしたか + snippet 付）
 reseden schema                    # 出力 JSON のスキーマ概要
 reseden verify                    # 抽出結果の健全性チェック（exit 0=OK / 1=error）
-reseden --version                 # インストール済みバージョン
 ```
 
-`reseden <cmd> --help` で各サブコマンドの詳細と使用例を表示する。
-`reseden info` / `reseden --help` だけで全体像が掴めるよう設計している。
+各サブコマンドの詳細と使用例は `reseden <cmd> --help`。
 
-アップグレード / アンインストール:
+### 更新・削除
 
 ```bash
 # 最新に追従
 uv tool upgrade reseden-master-spec
 
-# 現行を破棄して同じ URL で再インストール（ピン留めの付け外しにも使う）
+# 現行を破棄して同じ URL で再インストール（ピン留めの付け外しに使う）
 uv tool install --force 'git+https://github.com/kohii/reseden-master-spec'
 
-# 消す
+# アンインストール
 uv tool uninstall reseden-master-spec
 ```
 
-### 単発で試すだけなら uvx
+### 単発実行（uvx）
 
-インストールせず一度だけ実行したいとき:
+インストールせず一度だけ試したいとき:
 
 ```bash
 uvx --from 'git+https://github.com/kohii/reseden-master-spec' reseden info
@@ -127,11 +119,9 @@ uvx --from 'git+https://github.com/kohii/reseden-master-spec' reseden info
 
 ### 補足
 
-- tag は **semver (`vX.Y.Z`)** で付与する。PDF の改定とツール改修の両方をリリース契機にできるため。
-- 同梱される PDF 版は `reseden masters`（`version` フィールド）または `manifest.json` で確認できる。
+- 同梱される PDF 版は `reseden info` または `manifest.json` で確認できる。
 - `--out-dir` 省略時のデータ解決順: `(1) CWD/data` に版があればそれ → `(2) パッケージ同梱 data/`
-- 同梱版より新しい PDF を自前で抽出したい場合は、下の「開発者向け」参照。
-- `fetch`（PDFダウンロード→再抽出）は Poppler などビルド時依存が必要なので配布版での利用は想定していない。ローカルに clone してから使う。
+- `fetch`（PDFダウンロード→再抽出）は Poppler 等のビルド時依存が必要なので配布版での利用は想定していない。開発者向け参照。
 
 ## 開発者向け
 
