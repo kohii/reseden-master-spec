@@ -66,24 +66,20 @@ reseden-master-spec/
 
 ## 使い方（配布版）
 
-抽出済みJSONの一覧・検索だけしたい利用者は、このリポジトリを直接 `uvx` で実行できる。
-ローカルインストール不要。
+抽出済みJSONの一覧・検索だけしたい利用者向け。ローカルに clone 不要。
+`uv` を事前にインストールしておく（[インストール手順](https://docs.astral.sh/uv/getting-started/installation/)）。
+
+### インストール（推奨）
 
 ```bash
-# 最新（main）の同梱データを使って実行
-uvx --from 'git+https://github.com/kohii/reseden-master-spec' reseden masters
+# グローバルに reseden コマンドを入れる（semver タグでピン留め）
+uv tool install 'git+https://github.com/kohii/reseden-master-spec@v0.1.0'
 
-# 特定のツールリリースに固定（semver タグでピン留め）
-uvx --from 'git+https://github.com/kohii/reseden-master-spec@v0.1.0' reseden field iyakuhin 14
-
-# タグが未付与なら commit SHA でも可
-uvx --from 'git+https://github.com/kohii/reseden-master-spec@<sha>' reseden masters
+# 初回のみ、シェルに PATH を通す
+uv tool update-shell
 ```
 
-- tag は **semver (`vX.Y.Z`)** で付与する。PDF の改定とツール改修の両方をリリース契機にできるため。
-- 同梱される PDF 版は `reseden masters`（`version` フィールド）または `manifest.json` で確認できる。
-
-配布版で使えるサブコマンド:
+インストール後はどこからでもコマンドが使える:
 
 ```bash
 reseden masters               # 同梱バージョンのマスター一覧
@@ -92,8 +88,34 @@ reseden field iyakuhin 14     # 項番14 (麻薬・毒薬・覚醒剤原料等) 
 reseden code iyakuhin 14 3    # 項番14のコード値 "3" を引く
 reseden search 後発品          # キーワード検索
 reseden verify                # 抽出結果の健全性チェック
+reseden --version             # インストール済みバージョン
 ```
 
+新しいリリースに上げる / アンインストール:
+
+```bash
+# 別のタグに差し替え
+uv tool install --force 'git+https://github.com/kohii/reseden-master-spec@v0.2.0'
+
+# main 最新に追従
+uv tool upgrade reseden-master-spec
+
+# 消す
+uv tool uninstall reseden-master-spec
+```
+
+### 単発で試すだけなら uvx
+
+インストールせず一度だけ実行したいとき:
+
+```bash
+uvx --from 'git+https://github.com/kohii/reseden-master-spec@v0.1.0' reseden masters
+```
+
+### 補足
+
+- tag は **semver (`vX.Y.Z`)** で付与する。PDF の改定とツール改修の両方をリリース契機にできるため。
+- 同梱される PDF 版は `reseden masters`（`version` フィールド）または `manifest.json` で確認できる。
 - `--out-dir` 省略時のデータ解決順: `(1) CWD/data` に版があればそれ → `(2) パッケージ同梱 data/`
 - 同梱版より新しい PDF を自前で抽出したい場合は、下の「開発者向け」参照。
 - `fetch`（PDFダウンロード→再抽出）は Poppler などビルド時依存が必要なので配布版での利用は想定していない。ローカルに clone してから使う。
