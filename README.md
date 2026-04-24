@@ -71,13 +71,21 @@ reseden-master-spec/
 
 ### インストール（推奨）
 
+デフォルトでは **main の最新** を入れる。こうすることで README のコピペが古くならない。
+
 ```bash
-# グローバルに reseden コマンドを入れる（semver タグでピン留め）
-uv tool install 'git+https://github.com/kohii/reseden-master-spec@v0.1.0'
+# グローバルに reseden コマンドを入れる
+uv tool install 'git+https://github.com/kohii/reseden-master-spec'
 
 # 初回のみ、シェルに PATH を通す
 uv tool update-shell
 ```
+
+インストール済みバージョンの確認は `reseden --version`。
+利用可能なリリース一覧は [Releases](https://github.com/kohii/reseden-master-spec/releases) を参照。
+
+> **特定バージョンに固定したい場合** は URL 末尾に `@vX.Y.Z` を付ける:
+> `uv tool install 'git+https://github.com/kohii/reseden-master-spec@vX.Y.Z'`
 
 インストール後はどこからでもコマンドが使える:
 
@@ -96,14 +104,14 @@ reseden --version                 # インストール済みバージョン
 `reseden <cmd> --help` で各サブコマンドの詳細と使用例を表示する。
 `reseden info` / `reseden --help` だけで全体像が掴めるよう設計している。
 
-新しいリリースに上げる / アンインストール:
+アップグレード / アンインストール:
 
 ```bash
-# 別のタグに差し替え
-uv tool install --force 'git+https://github.com/kohii/reseden-master-spec@v0.2.0'
-
-# main 最新に追従
+# 最新に追従
 uv tool upgrade reseden-master-spec
+
+# 現行を破棄して同じ URL で再インストール（ピン留めの付け外しにも使う）
+uv tool install --force 'git+https://github.com/kohii/reseden-master-spec'
 
 # 消す
 uv tool uninstall reseden-master-spec
@@ -114,7 +122,7 @@ uv tool uninstall reseden-master-spec
 インストールせず一度だけ実行したいとき:
 
 ```bash
-uvx --from 'git+https://github.com/kohii/reseden-master-spec@v0.1.0' reseden masters
+uvx --from 'git+https://github.com/kohii/reseden-master-spec' reseden info
 ```
 
 ### 補足
