@@ -82,14 +82,19 @@ uv tool update-shell
 インストール後はどこからでもコマンドが使える:
 
 ```bash
-reseden masters               # 同梱バージョンのマスター一覧
-reseden fields iyakuhin       # 医薬品マスターの全項目
-reseden field iyakuhin 14     # 項番14 (麻薬・毒薬・覚醒剤原料等) の詳細
-reseden code iyakuhin 14 3    # 項番14のコード値 "3" を引く
-reseden search 後発品          # キーワード検索
-reseden verify                # 抽出結果の健全性チェック
-reseden --version             # インストール済みバージョン
+reseden info                      # 同梱データ版・マスター一覧・主要コマンドガイド
+reseden masters                   # 全マスター（masterId と fieldCount）
+reseden fields iyakuhin --summary # seq/name/mode/maxBytes/hasCodes の簡略版
+reseden field iyakuhin 14         # 項番14 の詳細（codes 含む）
+reseden code iyakuhin 14 3        # 項番14 のコード値 "3" を引く
+reseden search 後発品 --limit 10   # キーワード検索（どこでヒットしたか + snippet 付）
+reseden schema                    # 出力 JSON のスキーマ概要
+reseden verify                    # 抽出結果の健全性チェック（exit 0=OK / 1=error）
+reseden --version                 # インストール済みバージョン
 ```
+
+`reseden <cmd> --help` で各サブコマンドの詳細と使用例を表示する。
+`reseden info` / `reseden --help` だけで全体像が掴めるよう設計している。
 
 新しいリリースに上げる / アンインストール:
 
