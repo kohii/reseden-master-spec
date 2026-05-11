@@ -1,7 +1,7 @@
 {
   "version": "20260501",
   "extractorVersion": "0.1.0",
-  "extractedAt": "2026-05-11T01:30:54Z",
+  "extractedAt": "2026-05-11T03:20:58Z",
   "dependencies": {
     "pdfplumber": "0.11.9",
     "pdftotext": "pdftotext version 26.02.0"
@@ -268,7 +268,7 @@
       "sourceUrl": "https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/index.files/master_2_20260501.pdf",
       "sourceSha256": "8e6fc41270394966511cc105142b0556ca7ebce40bd223102d39f110a9c28555",
       "sourceVersion": "20260501",
-      "extractedAt": "2026-05-11T01:29:42Z"
+      "extractedAt": "2026-05-11T03:20:58Z"
     },
     {
       "kind": "master",
@@ -309,7 +309,7 @@
         }
       ],
       "file": "nayose.json",
-      "rowCount": 11,
+      "rowCount": 20,
       "sourcePdf": "master_2_20260501.pdf"
     }
   ]

@@ -206,114 +206,259 @@ def extract_shisetsu_kijun(
 # ---------------------------------------------------------------------------
 
 
+_TARGET_CODE_X_RANGE = (55.0, 105.0)  # 名寄せ先コード列のX範囲（経験則）
+_TARGET_NAME_X_RANGE = (100.0, 205.0)  # 名寄せ先名称列
+_SOURCE_CODE_X_RANGE = (205.0, 260.0)
+_SOURCE_NAME_X_RANGE = (255.0, 420.0)
+_NOTE_X_RANGE = (415.0, 600.0)
+# 名寄せ先コード列を構成する縦罫線間の水平罫線。pdfplumber が rect 化したものから
+# 列幅 ≈ 42 のものを target_code セル境界として利用する。
+_TARGET_CELL_LINE_X0_RANGE = (55.0, 60.0)
+_TARGET_CELL_LINE_X1_RANGE = (95.0, 100.0)
+# 名寄せ元コード列の水平罫線。x0≈206, x1≈258 で各 source 行の境界を表す。
+_SOURCE_CELL_LINE_X0_RANGE = (205.0, 210.0)
+_SOURCE_CELL_LINE_X1_RANGE = (256.0, 260.0)
+
+
+def _word_in_range(word: dict, x_range: tuple[float, float]) -> bool:
+    return x_range[0] <= word["x0"] <= x_range[1]
+
+
+def _word_in_y_range(word: dict, y_top: float, y_bot: float) -> bool:
+    return y_top <= word["top"] <= y_bot
+
+
+def _is_target_code_token(text: str) -> bool:
+    """target_code は 3-4桁の数字。実例は 849 と 8001〜8030 周辺。"""
+    return text.isdigit() and 3 <= len(text) <= 4
+
+
+def _is_source_code_token(text: str) -> bool:
+    return text.isdigit() and 1 <= len(text) <= 5
+
+
+def _collect_text_in_box(
+    words: list[dict], x_range: tuple[float, float], y_top: float, y_bot: float
+) -> str:
+    """与えられた x/y 範囲に含まれる words のテキストを連結（改行・空白除去）。"""
+    parts = [
+        w["text"]
+        for w in sorted(words, key=lambda w: (w["top"], w["x0"]))
+        if _word_in_range(w, x_range) and _word_in_y_range(w, y_top, y_bot)
+    ]
+    return _flat("".join(parts))
+
+
 @dataclass
-class NayoseCols:
-    target_code: int
-    target_name: int
-    source_code: int
-    source_name: int
-    note: int | None  # 備考列がない（最終ページなど）場合は None
+class _NayoseRegion:
+    """1つの名寄せグループの Y 領域とメタ情報"""
+
+    y_top: float
+    y_bot: float
+    code: str
+    target_name: str
+    note: str
+    sources: list[dict[str, str]]
 
 
-def _detect_nayose_columns(table: list[list[str | None]]) -> NayoseCols | None:
-    """データ行から名寄せ表の論理5列を推定する。
+def _find_body_start_y(words: list[dict]) -> float:
+    """ヘッダ行 ('コード'/'名称') の最下端 Y を返す。
 
-    名寄せ表は ターゲット(コード,名称) + ソース(コード,名称) + 備考 の最大5列。
-    最終ページ等で備考列が省略されているケースは4列に落とす。
+    ページ冒頭（y < 130）かつ target_code/source_code 列の x 位置に絞り、
+    本文中に出現する '名寄せコード）' のような単語に引きずられないようにする。
     """
-    # 名寄せ表であることをヘッダ行で確認（無関係な表を排除）
-    header_row = next(
-        (
-            r
-            for r in table
-            if _is_header_row(r)
-            and any(_flat(c) == "名寄せ先" for c in r)
-            and any(_flat(c) == "名寄せ元" for c in r)
-        ),
-        None,
-    )
-    if header_row is None:
-        return None
-    target_pos = next(i for i, c in enumerate(header_row) if _flat(c) == "名寄せ先")
-    source_pos = next(i for i, c in enumerate(header_row) if _flat(c) == "名寄せ元")
-    note_pos = next(
-        (i for i, c in enumerate(header_row) if _flat(c) == "備考"), -1
-    )
-
-    data = _data_rows(table)
-    if not data:
-        return None
-    # 5列（備考あり）→ 4列（備考なし）の順で試す
-    for n in (5, 4):
-        candidates = _detect_logical_columns(data, n)
-        if candidates is None:
+    y = 0.0
+    for w in words:
+        if w["top"] >= 130:
             continue
-        target_side = [c for c in candidates if c < source_pos]
-        if note_pos > 0:
-            source_side = [c for c in candidates if source_pos <= c < note_pos]
-            note_side = [c for c in candidates if c >= note_pos]
-        else:
-            source_side = [c for c in candidates if c >= source_pos]
-            note_side = []
-        if len(target_side) == 2 and len(source_side) == 2 and (
-            (n == 5 and len(note_side) == 1) or (n == 4 and not note_side)
-        ):
-            return NayoseCols(
-                target_code=target_side[0],
-                target_name=target_side[1],
-                source_code=source_side[0],
-                source_name=source_side[1],
-                note=note_side[0] if note_side else None,
+        if _flat(w["text"]) not in ("名称", "コード"):
+            continue
+        # 'コード' ヘッダは x0 ≈ 62 (target側) / 211 (source側) に出現する
+        if not (55 <= w["x0"] <= 80 or 130 <= w["x0"] <= 170 or 205 <= w["x0"] <= 230 or 340 <= w["x0"] <= 380):
+            continue
+        y = max(y, w["bottom"])
+    return y + 2.0 if y > 0 else 60.0
+
+
+def _target_cell_boundaries(page: pdfplumber.page.Page, body_start_y: float) -> list[float]:
+    """名寄せ先コード列の水平罫線 Y 座標を昇順で返す。
+
+    これらの罫線は target_code 列のセル境界そのもの。隣接する2本の Y で挟まれる
+    範囲がひとつの merged cell（= ひとつの名寄せグループ）になる。
+    pdfplumber.find_tables() は merged cell を取りこぼすことがあるため、
+    rect 由来の生罫線から直接境界を組み立てる。
+    """
+    ys: set[float] = set()
+    for r in page.rects:
+        if r["height"] >= 2:
+            continue
+        if not (_TARGET_CELL_LINE_X0_RANGE[0] <= r["x0"] <= _TARGET_CELL_LINE_X0_RANGE[1]):
+            continue
+        if not (_TARGET_CELL_LINE_X1_RANGE[0] <= r["x1"] <= _TARGET_CELL_LINE_X1_RANGE[1]):
+            continue
+        ys.add(round(r["top"], 1))
+    # 本文開始 Y 以降の罫線だけ採用（ヘッダ罫線は除外）。
+    return sorted(y for y in ys if y >= body_start_y - 1.0)
+
+
+def _collect_regions_from_boundaries(
+    page: pdfplumber.page.Page,
+    boundaries: list[float],
+    words: list[dict],
+    page_height: float,
+) -> list[_NayoseRegion]:
+    """target_code 列の水平罫線で区切られた各 Y 帯を region 化する。
+
+    各帯の中で target_code word を探す。存在しない帯（= 前ページからの継続）は
+    region 化しない。
+    """
+    if not boundaries:
+        return []
+    segments: list[tuple[float, float]] = []
+    for i, y in enumerate(boundaries):
+        y_top = y
+        y_bot = boundaries[i + 1] if i + 1 < len(boundaries) else page_height
+        if y_bot - y_top < 5.0:
+            continue  # ヘッダ等の薄い帯は無視
+        segments.append((y_top, y_bot))
+
+    regions: list[_NayoseRegion] = []
+    for y_top, y_bot in segments:
+        target_words = [
+            w
+            for w in words
+            if _word_in_range(w, _TARGET_CODE_X_RANGE)
+            and _is_target_code_token(w["text"])
+            and y_top <= w["top"] < y_bot
+        ]
+        if not target_words:
+            continue  # 継続グループ（target_code なし）
+        target_words.sort(key=lambda w: w["top"])
+        code = _normalize_code(target_words[0]["text"])
+        target_name = _collect_text_in_box(words, _TARGET_NAME_X_RANGE, y_top, y_bot)
+        note = _collect_text_in_box(words, _NOTE_X_RANGE, y_top, y_bot)
+        regions.append(
+            _NayoseRegion(
+                y_top=y_top,
+                y_bot=y_bot,
+                code=code,
+                target_name=target_name,
+                note=note,
+                sources=[],
             )
-    return None
+        )
+    return regions
+
+
+def _source_row_boundaries(page: pdfplumber.page.Page, body_start_y: float) -> list[float]:
+    """名寄せ元コード列の水平罫線 Y を昇順で返す。各 source 行を一意に区切る。"""
+    ys: set[float] = set()
+    for r in page.rects:
+        if r["height"] >= 2:
+            continue
+        if not (_SOURCE_CELL_LINE_X0_RANGE[0] <= r["x0"] <= _SOURCE_CELL_LINE_X0_RANGE[1]):
+            continue
+        if not (_SOURCE_CELL_LINE_X1_RANGE[0] <= r["x1"] <= _SOURCE_CELL_LINE_X1_RANGE[1]):
+            continue
+        ys.add(round(r["top"], 1))
+    return sorted(y for y in ys if y >= body_start_y - 1.0)
+
+
+def _attach_sources_to_regions(
+    regions: list[_NayoseRegion],
+    page: pdfplumber.page.Page,
+    words: list[dict],
+    body_start_y: float,
+    previous_group: dict[str, Any] | None,
+) -> None:
+    """source 列の水平罫線で1行ずつ区切り、含む region (または継続グループ) に紐付ける。"""
+    src_boundaries = _source_row_boundaries(page, body_start_y)
+    for i in range(len(src_boundaries) - 1):
+        y_top = src_boundaries[i]
+        y_bot = src_boundaries[i + 1]
+        if y_bot - y_top < 5.0 or y_bot - y_top > 40.0:
+            continue  # ヘッダ罫線間 / 想定外の高さは無視
+        src_code = _collect_text_in_box(words, _SOURCE_CODE_X_RANGE, y_top, y_bot)
+        if not src_code or not _is_source_code_token(src_code):
+            continue
+        src_name = _collect_text_in_box(words, _SOURCE_NAME_X_RANGE, y_top, y_bot)
+        entry = {"code": _normalize_code(src_code), "name": src_name}
+        # 含まれる region を探す（Y中心で判定）
+        y_mid = (y_top + y_bot) / 2
+        target_region = next(
+            (r for r in regions if r.y_top <= y_mid < r.y_bot), None
+        )
+        if target_region is not None:
+            target_region.sources.append(entry)
+        elif previous_group is not None:
+            previous_group["sources"].append(entry)
 
 
 def extract_nayose(
     pdf: pdfplumber.PDF, page_range: tuple[int, int]
 ) -> tuple[list[dict[str, Any]], list[dict[str, int]]]:
-    """名寄せコード一覧を groups 形式で返す。"""
+    """名寄せコード一覧を groups 形式で返す。
+
+    pdfplumber.extract_tables() は target_code 列の merged cell を取りこぼすことが
+    多い（例: 8014 / 8015 は cell として認識されない）。
+
+    そこで、page.rects から target_code 列の水平罫線 Y 座標を集め、
+    それらで区切られた Y 帯 = 名寄せ先グループ として処理する:
+
+    1. 罫線 Y で Y 帯を切り出す
+    2. 各 Y 帯に target_code word があればその帯を 1 グループとする
+    3. target_code word が無い Y 帯は前ページからの継続テキスト (target_name / 備考)
+       とソース行とみなし、直前グループに合流させる
+    4. source 行は find_tables() の sub-row (height ≤ 35) から x 位置で抽出
+    """
     start, end = page_range
-    groups: list[dict[str, Any]] = []
-    current: dict[str, Any] | None = None
+    all_groups: list[dict[str, Any]] = []
+
     for page_no in range(start, end + 1):
         page = pdf.pages[page_no - 1]
-        tables = page.extract_tables() or []
-        for table in tables:
-            if not table or len(table) < 2:
-                continue
-            cols = _detect_nayose_columns(table)
-            if cols is None:
-                continue
-            for row in _data_rows(table):
-                def _at(idx: int | None) -> str:
-                    if idx is None or idx >= len(row):
-                        return ""
-                    return _cell_text(row[idx])
+        words = page.extract_words(use_text_flow=False, keep_blank_chars=False)
+        body_start_y = _find_body_start_y(words)
 
-                t_code = _normalize_code(row[cols.target_code]) if cols.target_code < len(row) else ""
-                t_name = _at(cols.target_name)
-                s_code = _normalize_code(row[cols.source_code]) if cols.source_code < len(row) else ""
-                s_name = _at(cols.source_name)
-                note = _at(cols.note) if cols.note is not None else ""
+        boundaries = _target_cell_boundaries(page, body_start_y)
+        if not boundaries:
+            continue
+        regions = _collect_regions_from_boundaries(page, boundaries, words, page.height)
 
-                if t_code and t_code.isdigit():
-                    current = {
-                        "targetCode": t_code,
-                        "targetName": t_name,
-                        "sources": [],
-                        "note": note,
-                    }
-                    groups.append(current)
-                elif current is not None and note:
-                    if not current["note"]:
-                        current["note"] = note
-                    elif note not in current["note"]:
-                        current["note"] = (current["note"] + " " + note).strip()
+        previous_group = all_groups[-1] if all_groups else None
 
-                if s_code and current is not None:
-                    current["sources"].append({"code": s_code, "name": s_name})
+        # 前ページから続く先頭の継続帯（target_code word のない先頭セグメント）から
+        # target_name / note を直前グループに合流する
+        if previous_group is not None and boundaries:
+            first_region_y_top = regions[0].y_top if regions else page.height
+            if first_region_y_top > boundaries[0] + 1.0:
+                cont_top = boundaries[0]
+                cont_bot = first_region_y_top
+                extra_name = _collect_text_in_box(
+                    words, _TARGET_NAME_X_RANGE, cont_top, cont_bot
+                )
+                extra_note = _collect_text_in_box(
+                    words, _NOTE_X_RANGE, cont_top, cont_bot
+                )
+                if extra_name and extra_name not in previous_group["targetName"]:
+                    previous_group["targetName"] = (
+                        previous_group["targetName"] + extra_name
+                    )
+                if extra_note and extra_note not in previous_group["note"]:
+                    previous_group["note"] = previous_group["note"] + extra_note
 
-    return groups, [{"start": start, "end": end}]
+        _attach_sources_to_regions(regions, page, words, body_start_y, previous_group)
+
+        for r in regions:
+            all_groups.append(
+                {
+                    "targetCode": r.code,
+                    "targetName": r.target_name,
+                    "sources": r.sources,
+                    "note": r.note,
+                }
+            )
+
+    return all_groups, [{"start": start, "end": end}]
 
 
 # ---------------------------------------------------------------------------
