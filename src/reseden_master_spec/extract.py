@@ -12,7 +12,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 import shutil
@@ -20,13 +19,12 @@ import subprocess
 import sys
 import unicodedata
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 import pdfplumber
 
-from . import text_supplement
+from . import manifest_io, text_supplement
 
 EXTRACTOR_VERSION = "0.1.0"
 
@@ -968,14 +966,6 @@ def infer_version_from_path(pdf_path: Path) -> str:
     return "unknown"
 
 
-def _sha256_of(path: Path) -> str:
-    h = hashlib.sha256()
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(1 << 20), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
 def _pdftotext_version() -> str:
     """pdftotext のバージョン文字列を返す。無ければ空文字。"""
     exe = shutil.which("pdftotext")
@@ -1017,19 +1007,35 @@ def main(argv: list[str] | None = None) -> int:
     version = version_override or infer_version_from_path(pdf_path)
     print(f"[extract] pdf={pdf_path.name} version={version}", file=sys.stderr)
 
-    manifest: dict[str, Any] = {
-        "version": version,
-        "sourcePdf": pdf_path.name,
-        "sourceUrl": source_url,
-        "sourceSha256": _sha256_of(pdf_path),
-        "extractorVersion": EXTRACTOR_VERSION,
-        "extractedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "dependencies": {
+    # 既存manifestを引き継ぐ（codeTables 等の別kind成果物を温存する）
+    manifest = manifest_io.read_manifest(out_dir)
+    if manifest is None:
+        manifest = manifest_io.init_manifest(
+            version=version,
+            extractor_version=EXTRACTOR_VERSION,
+            dependencies={
+                "pdfplumber": getattr(pdfplumber, "__version__", "unknown"),
+                "pdftotext": _pdftotext_version(),
+            },
+        )
+    else:
+        manifest_io.ensure_shape(manifest)
+        manifest["version"] = version
+        manifest["extractorVersion"] = EXTRACTOR_VERSION
+        manifest["dependencies"] = {
             "pdfplumber": getattr(pdfplumber, "__version__", "unknown"),
             "pdftotext": _pdftotext_version(),
-        },
-        "masters": [],
-    }
+        }
+    # この実行で書き直す master 由来部分は一旦クリア
+    manifest["masters"] = []
+    manifest_io.upsert_source(
+        manifest,
+        kind="master",
+        source_pdf=pdf_path.name,
+        source_url=source_url,
+        source_sha256=manifest_io.sha256_of(pdf_path),
+        source_version=infer_version_from_path(pdf_path),
+    )
     sections_debug: list[dict[str, Any]] = []
 
     with pdfplumber.open(pdf_path) as pdf:
@@ -1102,10 +1108,7 @@ def main(argv: list[str] | None = None) -> int:
                 }
             )
 
-    (out_dir / "manifest.json").write_text(
-        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    manifest_io.write_manifest(out_dir, manifest)
     (out_dir / "sections.debug.json").write_text(
         json.dumps(sections_debug, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",

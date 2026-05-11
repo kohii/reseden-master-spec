@@ -1,0 +1,341 @@
+[
+  {
+    "masterId": "shoubyomei",
+    "masterName": "傷病名マスター",
+    "subName": null,
+    "pages": {
+      "start": 12,
+      "end": 16
+    },
+    "rawRecordCount": 42,
+    "fieldCount": 46,
+    "sourceCounts": {
+      "pdfplumber": 46
+    }
+  },
+  {
+    "masterId": "shushokugo",
+    "masterName": "修飾語マスター",
+    "subName": null,
+    "pages": {
+      "start": 17,
+      "end": 18
+    },
+    "rawRecordCount": 19,
+    "fieldCount": 19,
+    "sourceCounts": {
+      "pdfplumber": 19
+    }
+  },
+  {
+    "masterId": "shishiki",
+    "masterName": "歯式マスター",
+    "subName": null,
+    "pages": {
+      "start": 19,
+      "end": 20
+    },
+    "rawRecordCount": 8,
+    "fieldCount": 9,
+    "sourceCounts": {
+      "pdfplumber": 9
+    }
+  },
+  {
+    "masterId": "iyakuhin",
+    "masterName": "医薬品マスター",
+    "subName": null,
+    "pages": {
+      "start": 21,
+      "end": 24
+    },
+    "rawRecordCount": 42,
+    "fieldCount": 43,
+    "sourceCounts": {
+      "pdfplumber": 43
+    }
+  },
+  {
+    "masterId": "tokutei_kizai",
+    "masterName": "特定器材マスター",
+    "subName": null,
+    "pages": {
+      "start": 25,
+      "end": 28
+    },
+    "rawRecordCount": 39,
+    "fieldCount": 39,
+    "sourceCounts": {
+      "pdfplumber": 38,
+      "text": 1
+    }
+  },
+  {
+    "masterId": "comment",
+    "masterName": "コメントマスター",
+    "subName": null,
+    "pages": {
+      "start": 29,
+      "end": 30
+    },
+    "rawRecordCount": 21,
+    "fieldCount": 30,
+    "sourceCounts": {
+      "pdfplumber": 28,
+      "text": 2
+    }
+  },
+  {
+    "masterId": "ika_shinryoukoui",
+    "masterName": "医科診療行為マスター",
+    "subName": null,
+    "pages": {
+      "start": 31,
+      "end": 54
+    },
+    "rawRecordCount": 138,
+    "fieldCount": 151,
+    "sourceCounts": {
+      "pdfplumber": 133,
+      "text": 6,
+      "range+text": 12
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui",
+    "masterName": "歯科診療行為マスター",
+    "subName": null,
+    "pages": {
+      "start": 55,
+      "end": 63
+    },
+    "rawRecordCount": 68,
+    "fieldCount": 77,
+    "sourceCounts": {
+      "pdfplumber": 56,
+      "text": 11,
+      "range+text": 10
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui_イ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "基本・通則加算対応テーブル",
+    "pages": {
+      "start": 64,
+      "end": 64
+    },
+    "rawRecordCount": 10,
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 7,
+      "text": 3
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui_ウ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "基本・基本加算対応テーブル",
+    "pages": {
+      "start": 65,
+      "end": 65
+    },
+    "rawRecordCount": 10,
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 7,
+      "text": 3
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui_エ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "基本・注加算対応テーブル",
+    "pages": {
+      "start": 66,
+      "end": 66
+    },
+    "rawRecordCount": 10,
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 7,
+      "text": 3
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui_オ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "手技・材料加算対応テーブル",
+    "pages": {
+      "start": 67,
+      "end": 67
+    },
+    "rawRecordCount": 10,
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 7,
+      "text": 3
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui_カ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "算定回数限度テーブル",
+    "pages": {
+      "start": 68,
+      "end": 68
+    },
+    "rawRecordCount": 13,
+    "fieldCount": 15,
+    "sourceCounts": {
+      "pdfplumber": 15
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui_キ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "きざみテーブル",
+    "pages": {
+      "start": 69,
+      "end": 71
+    },
+    "rawRecordCount": 18,
+    "fieldCount": 20,
+    "sourceCounts": {
+      "pdfplumber": 19,
+      "text": 1
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui_ク",
+    "masterName": "歯科診療行為マスター",
+    "subName": "年齢制限テーブル",
+    "pages": {
+      "start": 72,
+      "end": 73
+    },
+    "rawRecordCount": 12,
+    "fieldCount": 14,
+    "sourceCounts": {
+      "pdfplumber": 14
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui_ケ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "併算定背反テーブル",
+    "pages": {
+      "start": 74,
+      "end": 75
+    },
+    "rawRecordCount": 15,
+    "fieldCount": 104,
+    "sourceCounts": {
+      "pdfplumber": 14,
+      "range+text-subs": 90
+    }
+  },
+  {
+    "masterId": "shika_shinryoukoui_コ",
+    "masterName": "歯科診療行為マスター",
+    "subName": "実日数関連テーブル",
+    "pages": {
+      "start": 76,
+      "end": 77
+    },
+    "rawRecordCount": 12,
+    "fieldCount": 14,
+    "sourceCounts": {
+      "pdfplumber": 13,
+      "text": 1
+    }
+  },
+  {
+    "masterId": "chouzai_koui",
+    "masterName": "調剤行為マスター",
+    "subName": null,
+    "pages": {
+      "start": 78,
+      "end": 84
+    },
+    "rawRecordCount": 49,
+    "fieldCount": 77,
+    "sourceCounts": {
+      "pdfplumber": 68,
+      "text": 9
+    }
+  },
+  {
+    "masterId": "houmon_kango",
+    "masterName": "訪問看護療養費マスター",
+    "subName": null,
+    "pages": {
+      "start": 85,
+      "end": 91
+    },
+    "rawRecordCount": 43,
+    "fieldCount": 86,
+    "sourceCounts": {
+      "pdfplumber": 69,
+      "text": 17
+    }
+  },
+  {
+    "masterId": "houmon_kango_イ",
+    "masterName": "訪問看護療養費マスター",
+    "subName": "基本・基本加算対応テーブル",
+    "pages": {
+      "start": 92,
+      "end": 92
+    },
+    "rawRecordCount": 7,
+    "fieldCount": 11,
+    "sourceCounts": {
+      "pdfplumber": 9,
+      "text": 2
+    }
+  },
+  {
+    "masterId": "houmon_kango_ウ",
+    "masterName": "訪問看護療養費マスター",
+    "subName": "算定回数限度テーブル",
+    "pages": {
+      "start": 93,
+      "end": 93
+    },
+    "rawRecordCount": 8,
+    "fieldCount": 10,
+    "sourceCounts": {
+      "pdfplumber": 10
+    }
+  },
+  {
+    "masterId": "houmon_kango_エ",
+    "masterName": "訪問看護療養費マスター",
+    "subName": "併算定背反テーブル",
+    "pages": {
+      "start": 94,
+      "end": 95
+    },
+    "rawRecordCount": 8,
+    "fieldCount": 13,
+    "sourceCounts": {
+      "pdfplumber": 8,
+      "text": 5
+    }
+  },
+  {
+    "masterId": "houmon_kango_オ",
+    "masterName": "訪問看護療養費マスター",
+    "subName": "施設基準テーブル",
+    "pages": {
+      "start": 96,
+      "end": 97
+    },
+    "rawRecordCount": 9,
+    "fieldCount": 9,
+    "sourceCounts": {
+      "pdfplumber": 9
+    }
+  }
+]
