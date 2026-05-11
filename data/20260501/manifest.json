@@ -1,0 +1,316 @@
+{
+  "version": "20260501",
+  "extractorVersion": "0.1.0",
+  "extractedAt": "2026-05-11T03:20:58Z",
+  "dependencies": {
+    "pdfplumber": "0.11.9",
+    "pdftotext": "pdftotext version 26.02.0"
+  },
+  "masters": [
+    {
+      "masterId": "shoubyomei",
+      "masterName": "傷病名マスター",
+      "subName": null,
+      "pages": {
+        "start": 12,
+        "end": 16
+      },
+      "file": "shoubyomei.json",
+      "fieldCount": 46
+    },
+    {
+      "masterId": "shushokugo",
+      "masterName": "修飾語マスター",
+      "subName": null,
+      "pages": {
+        "start": 17,
+        "end": 18
+      },
+      "file": "shushokugo.json",
+      "fieldCount": 19
+    },
+    {
+      "masterId": "shishiki",
+      "masterName": "歯式マスター",
+      "subName": null,
+      "pages": {
+        "start": 19,
+        "end": 20
+      },
+      "file": "shishiki.json",
+      "fieldCount": 9
+    },
+    {
+      "masterId": "iyakuhin",
+      "masterName": "医薬品マスター",
+      "subName": null,
+      "pages": {
+        "start": 21,
+        "end": 24
+      },
+      "file": "iyakuhin.json",
+      "fieldCount": 43
+    },
+    {
+      "masterId": "tokutei_kizai",
+      "masterName": "特定器材マスター",
+      "subName": null,
+      "pages": {
+        "start": 25,
+        "end": 28
+      },
+      "file": "tokutei_kizai.json",
+      "fieldCount": 39
+    },
+    {
+      "masterId": "comment",
+      "masterName": "コメントマスター",
+      "subName": null,
+      "pages": {
+        "start": 29,
+        "end": 30
+      },
+      "file": "comment.json",
+      "fieldCount": 30
+    },
+    {
+      "masterId": "ika_shinryoukoui",
+      "masterName": "医科診療行為マスター",
+      "subName": null,
+      "pages": {
+        "start": 31,
+        "end": 54
+      },
+      "file": "ika_shinryoukoui.json",
+      "fieldCount": 151
+    },
+    {
+      "masterId": "shika_shinryoukoui",
+      "masterName": "歯科診療行為マスター",
+      "subName": null,
+      "pages": {
+        "start": 55,
+        "end": 63
+      },
+      "file": "shika_shinryoukoui.json",
+      "fieldCount": 77
+    },
+    {
+      "masterId": "shika_shinryoukoui_イ",
+      "masterName": "歯科診療行為マスター",
+      "subName": "基本・通則加算対応テーブル",
+      "pages": {
+        "start": 64,
+        "end": 64
+      },
+      "file": "shika_shinryoukoui_イ.json",
+      "fieldCount": 10
+    },
+    {
+      "masterId": "shika_shinryoukoui_ウ",
+      "masterName": "歯科診療行為マスター",
+      "subName": "基本・基本加算対応テーブル",
+      "pages": {
+        "start": 65,
+        "end": 65
+      },
+      "file": "shika_shinryoukoui_ウ.json",
+      "fieldCount": 10
+    },
+    {
+      "masterId": "shika_shinryoukoui_エ",
+      "masterName": "歯科診療行為マスター",
+      "subName": "基本・注加算対応テーブル",
+      "pages": {
+        "start": 66,
+        "end": 66
+      },
+      "file": "shika_shinryoukoui_エ.json",
+      "fieldCount": 10
+    },
+    {
+      "masterId": "shika_shinryoukoui_オ",
+      "masterName": "歯科診療行為マスター",
+      "subName": "手技・材料加算対応テーブル",
+      "pages": {
+        "start": 67,
+        "end": 67
+      },
+      "file": "shika_shinryoukoui_オ.json",
+      "fieldCount": 10
+    },
+    {
+      "masterId": "shika_shinryoukoui_カ",
+      "masterName": "歯科診療行為マスター",
+      "subName": "算定回数限度テーブル",
+      "pages": {
+        "start": 68,
+        "end": 68
+      },
+      "file": "shika_shinryoukoui_カ.json",
+      "fieldCount": 15
+    },
+    {
+      "masterId": "shika_shinryoukoui_キ",
+      "masterName": "歯科診療行為マスター",
+      "subName": "きざみテーブル",
+      "pages": {
+        "start": 69,
+        "end": 71
+      },
+      "file": "shika_shinryoukoui_キ.json",
+      "fieldCount": 20
+    },
+    {
+      "masterId": "shika_shinryoukoui_ク",
+      "masterName": "歯科診療行為マスター",
+      "subName": "年齢制限テーブル",
+      "pages": {
+        "start": 72,
+        "end": 73
+      },
+      "file": "shika_shinryoukoui_ク.json",
+      "fieldCount": 14
+    },
+    {
+      "masterId": "shika_shinryoukoui_ケ",
+      "masterName": "歯科診療行為マスター",
+      "subName": "併算定背反テーブル",
+      "pages": {
+        "start": 74,
+        "end": 75
+      },
+      "file": "shika_shinryoukoui_ケ.json",
+      "fieldCount": 104
+    },
+    {
+      "masterId": "shika_shinryoukoui_コ",
+      "masterName": "歯科診療行為マスター",
+      "subName": "実日数関連テーブル",
+      "pages": {
+        "start": 76,
+        "end": 77
+      },
+      "file": "shika_shinryoukoui_コ.json",
+      "fieldCount": 14
+    },
+    {
+      "masterId": "chouzai_koui",
+      "masterName": "調剤行為マスター",
+      "subName": null,
+      "pages": {
+        "start": 78,
+        "end": 84
+      },
+      "file": "chouzai_koui.json",
+      "fieldCount": 77
+    },
+    {
+      "masterId": "houmon_kango",
+      "masterName": "訪問看護療養費マスター",
+      "subName": null,
+      "pages": {
+        "start": 85,
+        "end": 91
+      },
+      "file": "houmon_kango.json",
+      "fieldCount": 86
+    },
+    {
+      "masterId": "houmon_kango_イ",
+      "masterName": "訪問看護療養費マスター",
+      "subName": "基本・基本加算対応テーブル",
+      "pages": {
+        "start": 92,
+        "end": 92
+      },
+      "file": "houmon_kango_イ.json",
+      "fieldCount": 11
+    },
+    {
+      "masterId": "houmon_kango_ウ",
+      "masterName": "訪問看護療養費マスター",
+      "subName": "算定回数限度テーブル",
+      "pages": {
+        "start": 93,
+        "end": 93
+      },
+      "file": "houmon_kango_ウ.json",
+      "fieldCount": 10
+    },
+    {
+      "masterId": "houmon_kango_エ",
+      "masterName": "訪問看護療養費マスター",
+      "subName": "併算定背反テーブル",
+      "pages": {
+        "start": 94,
+        "end": 95
+      },
+      "file": "houmon_kango_エ.json",
+      "fieldCount": 13
+    },
+    {
+      "masterId": "houmon_kango_オ",
+      "masterName": "訪問看護療養費マスター",
+      "subName": "施設基準テーブル",
+      "pages": {
+        "start": 96,
+        "end": 97
+      },
+      "file": "houmon_kango_オ.json",
+      "fieldCount": 9
+    }
+  ],
+  "sources": [
+    {
+      "kind": "appendix",
+      "sourcePdf": "master_2_20260501.pdf",
+      "sourceUrl": "https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/index.files/master_2_20260501.pdf",
+      "sourceSha256": "8e6fc41270394966511cc105142b0556ca7ebce40bd223102d39f110a9c28555",
+      "sourceVersion": "20260501",
+      "extractedAt": "2026-05-11T03:20:58Z"
+    },
+    {
+      "kind": "master",
+      "sourcePdf": "master_0_20260501.pdf",
+      "sourceUrl": "https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/r08kaiteijoho.files/master_0_20260501.pdf",
+      "sourceSha256": "926928055bfe0dd8e0717a2676fd4dd1fc815664927aeaf37eba95262f205d46",
+      "sourceVersion": "20260501",
+      "extractedAt": "2026-05-11T01:30:31Z"
+    }
+  ],
+  "codeTables": [
+    {
+      "codeTableId": "shisetsu_kijun",
+      "codeTableName": "施設基準コード一覧",
+      "kind": "codeNamePairs",
+      "pages": [
+        {
+          "start": 31,
+          "end": 70
+        },
+        {
+          "start": 126,
+          "end": 127
+        }
+      ],
+      "file": "shisetsu_kijun.json",
+      "rowCount": 1971,
+      "sourcePdf": "master_2_20260501.pdf"
+    },
+    {
+      "codeTableId": "nayose",
+      "codeTableName": "名寄せコード一覧",
+      "kind": "nayoseGroups",
+      "pages": [
+        {
+          "start": 71,
+          "end": 80
+        }
+      ],
+      "file": "nayose.json",
+      "rowCount": 20,
+      "sourcePdf": "master_2_20260501.pdf"
+    }
+  ]
+}

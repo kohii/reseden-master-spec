@@ -1,26 +1,32 @@
 """reseden-master-spec CLI
 
-診療報酬制度「基本マスターファイル仕様書」PDFを構造化JSONで扱うCLI。
+診療報酬制度の以下2系統のPDFを構造化JSONで扱うCLI:
+
+  - 基本マスターファイル仕様書（master_0/1_*.pdf）: 項目仕様 → master
+  - 別紙（master_2_*.pdf）                       : 施設基準/名寄せコード等の補助表 → codeTable
+
 AIエージェント/人間のいずれも、この help の指示だけで必要な情報に辿り着けるよう設計している。
 
 == はじめの一歩 ==
 
   reseden info                    -- 同梱データの概要と主要サブコマンドの紹介
   reseden masters                 -- 全マスター一覧（masterId を確認）
+  reseden codetables              -- 別紙コード表一覧（codeTableId を確認）
   reseden fields <masterId>       -- そのマスターの全フィールド
 
 == 引く ==
 
   reseden field <masterId> <seq>           -- 1フィールドの詳細（codes 含む）
-  reseden code  <masterId> <seq> <code>    -- コード値名称の逆引き
-  reseden search <keyword> [--master-id M] [--limit N]
-                                           -- 全マスター横断のキーワード検索
+  reseden code  <masterId> <seq> <code>    -- マスターのコード値名称の逆引き
+  reseden codetable <id> [<code>]          -- 別紙コード表の全件 or 逆引き
+  reseden search <keyword> [--scope master|codetable] [--master-id M] [--limit N]
+                                           -- master / codeTable 横断検索
 
 == 補助 ==
 
   reseden versions                -- 抽出済みの版 (YYYYMMDD) 一覧
   reseden verify                  -- 抽出結果の健全性チェック（終了コード 0/1）
-  reseden schema                  -- フィールド/コード の JSON スキーマ概要
+  reseden schema                  -- master/codeTable の JSON スキーマ概要
   reseden skill                   -- エージェント用 SKILL.md を stdout に出力
   reseden --version               -- CLI ツール自体のバージョン
 
@@ -56,6 +62,7 @@ from urllib.parse import urlparse
 from urllib.request import Request, urlopen
 
 from . import extract as extractor
+from . import extract_appendix, manifest_io
 
 
 # ---------------------------------------------------------------------------
@@ -127,7 +134,9 @@ def _resolve_version(data_dir: Path, version: str | None) -> str:
 
 def _load_manifest(data_dir: Path, version: str) -> dict[str, Any]:
     path = data_dir / version / "manifest.json"
-    return json.loads(path.read_text(encoding="utf-8"))
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    # 旧スキーマも読み出し時点で正規化する（mutateするが書き戻さない）
+    return manifest_io.ensure_shape(raw)
 
 
 def _master_ids(data_dir: Path, version: str) -> list[str]:
@@ -142,6 +151,27 @@ def _load_master(data_dir: Path, version: str, master_id: str) -> dict[str, Any]
             f"error: master {master_id!r} not found in version {version}.\n"
             f"hint: available masterIds = [{', '.join(available)}]. "
             f"Try `reseden masters`."
+        )
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _codetable_ids(data_dir: Path, version: str) -> list[str]:
+    return [
+        ct["codeTableId"]
+        for ct in _load_manifest(data_dir, version).get("codeTables", [])
+    ]
+
+
+def _load_codetable(
+    data_dir: Path, version: str, code_table_id: str
+) -> dict[str, Any]:
+    path = data_dir / version / f"{code_table_id}.json"
+    if not path.exists():
+        available = _codetable_ids(data_dir, version)
+        sys.exit(
+            f"error: codeTable {code_table_id!r} not found in version {version}.\n"
+            f"hint: available codeTableIds = [{', '.join(available)}]. "
+            f"Try `reseden codetables`."
         )
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -185,18 +215,22 @@ def cmd_info(args: argparse.Namespace) -> int:
     if versions:
         manifest = _load_manifest(data_dir, versions[-1])
         payload["latest"] = {
-            "sourcePdf": manifest.get("sourcePdf"),
-            "sourceUrl": manifest.get("sourceUrl"),
+            "sources": manifest.get("sources", []),
             "extractorVersion": manifest.get("extractorVersion"),
             "extractedAt": manifest.get("extractedAt"),
-            "masterCount": len(manifest["masters"]),
-            "masterIds": [m["masterId"] for m in manifest["masters"]],
+            "masterCount": len(manifest.get("masters", [])),
+            "masterIds": [m["masterId"] for m in manifest.get("masters", [])],
+            "codeTableCount": len(manifest.get("codeTables", [])),
+            "codeTableIds": [
+                ct["codeTableId"] for ct in manifest.get("codeTables", [])
+            ],
         }
     payload["hints"] = [
-        "`reseden masters` でマスター一覧を取得",
+        "`reseden masters` でマスター一覧、`reseden codetables` で別紙コード表一覧",
         "`reseden fields <masterId>` でそのマスターの全フィールド",
         "`reseden field <masterId> <seq>` で1フィールドの詳細（codes含む）",
-        "`reseden search <keyword>` で全マスター横断検索",
+        "`reseden codetable <id> [<code>]` で別紙コード表の全件 or 逆引き",
+        "`reseden search <keyword>` で master / codeTable 横断検索",
         "`reseden schema` で出力スキーマの概要",
     ]
     _dump(payload)
@@ -229,15 +263,24 @@ def cmd_schema(args: argparse.Namespace) -> int:
             "code": "string (NFKC 正規化済み)",
             "name": "string",
         },
+        "codeTable": {
+            "codeTableId": "string (例: shisetsu_kijun)",
+            "codeTableName": "string",
+            "kind": "'codeNamePairs' | 'nayoseGroups'",
+            "version": "string (YYYYMMDD)",
+            "sourcePdf": "string (別紙PDFファイル名)",
+            "pages": "list[{start,end}]",
+            "codes": "list[{code,name}]  -- kind=codeNamePairs のみ",
+            "groups": "list[{targetCode,targetName,sources:[{code,name}],note}]  -- kind=nayoseGroups のみ",
+        },
         "manifest": {
-            "version": "string",
-            "sourcePdf": "string",
-            "sourceUrl": "string | null",
-            "sourceSha256": "string",
+            "version": "string (適用日 YYYYMMDD)",
             "extractorVersion": "string",
             "extractedAt": "ISO8601",
             "dependencies": "dict",
+            "sources": "list[{kind, sourcePdf, sourceUrl, sourceSha256, sourceVersion, extractedAt}]",
             "masters": "list[{masterId, masterName, subName, pages, file, fieldCount}]",
+            "codeTables": "list[{codeTableId, codeTableName, kind, pages, file, rowCount, sourcePdf}]",
         },
     }
     _dump(schema)
@@ -264,6 +307,35 @@ def cmd_skill(args: argparse.Namespace) -> int:
     return 0
 
 
+_PDF_KIND_RE = re.compile(r"master_(\d+)_\d{8}\.pdf$")
+
+
+def _infer_pdf_kind(filename: str, override: str | None) -> str:
+    """PDF ファイル名から 'master' か 'appendix' を返す。
+
+    - master_0_*.pdf, master_1_*.pdf -> 'master' (基本マスター仕様書本体)
+    - master_2_*.pdf                 -> 'appendix' (別紙)
+    """
+    if override:
+        return override
+    m = _PDF_KIND_RE.search(filename)
+    if not m:
+        sys.exit(
+            f"error: could not detect PDF kind from filename {filename!r}.\n"
+            "hint: filename should be like `master_0_YYYYMMDD.pdf` (master spec) or "
+            "`master_2_YYYYMMDD.pdf` (appendix), or pass --kind master|appendix."
+        )
+    n = int(m.group(1))
+    if n in (0, 1):
+        return "master"
+    if n == 2:
+        return "appendix"
+    sys.exit(
+        f"error: unknown master_N value {n} in filename {filename!r}.\n"
+        "hint: pass --kind master|appendix to override."
+    )
+
+
 def cmd_fetch(args: argparse.Namespace) -> int:
     data_dir = _data_dir(args.out_dir)
     raw_dir = data_dir / "raw"
@@ -288,9 +360,18 @@ def cmd_fetch(args: argparse.Namespace) -> int:
             f"error: could not infer version (YYYYMMDD) from filename {pdf_path.name!r}.\n"
             "hint: pass --version YYYYMMDD explicitly."
         )
+
+    kind = _infer_pdf_kind(pdf_path.name, args.kind)
     out_dir = data_dir / version
-    print(f"[fetch] extracting to {out_dir}", file=sys.stderr)
-    return extractor.main([str(pdf_path), str(out_dir), version, url])
+    # 別kindの既存成果物がある旧版から引き継ぐ（"1ディレクトリ=1適用日" の全資源スナップショット）
+    if not out_dir.exists():
+        manifest_io.seed_from_previous(data_dir, version, exclude_kind=kind)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    print(f"[fetch] extracting kind={kind} to {out_dir}", file=sys.stderr)
+    if kind == "master":
+        return extractor.main([str(pdf_path), str(out_dir), version, url])
+    return extract_appendix.main([str(pdf_path), str(out_dir), version, url])
 
 
 def cmd_versions(args: argparse.Namespace) -> int:
@@ -420,6 +501,124 @@ def cmd_code(args: argparse.Namespace) -> int:
 
 
 # ---------------------------------------------------------------------------
+# codeTable
+# ---------------------------------------------------------------------------
+
+
+def cmd_codetables(args: argparse.Namespace) -> int:
+    data_dir = _data_dir(args.out_dir)
+    version = _resolve_version(data_dir, args.version)
+    manifest = _load_manifest(data_dir, version)
+    rows = [
+        {
+            "codeTableId": ct["codeTableId"],
+            "codeTableName": ct["codeTableName"],
+            "kind": ct["kind"],
+            "rowCount": ct["rowCount"],
+            "pages": ct["pages"],
+            "sourcePdf": ct.get("sourcePdf"),
+        }
+        for ct in manifest.get("codeTables", [])
+    ]
+    _dump(
+        {
+            "version": version,
+            "codeTableCount": len(rows),
+            "codeTables": rows,
+            "hint": "次: reseden codetable <codeTableId> [<code>]",
+        }
+    )
+    return 0
+
+
+def _codetable_lookup(codetable: dict[str, Any], code_query: str) -> list[dict[str, Any]]:
+    """codeTable から code に一致する hit を抽出する"""
+    kind = codetable["kind"]
+    if kind == "codeNamePairs":
+        return [
+            {"match": "code", **c}
+            for c in codetable.get("codes", [])
+            if extractor.normalize_code(c["code"]) == code_query
+        ]
+    if kind == "nayoseGroups":
+        hits: list[dict[str, Any]] = []
+        for g in codetable.get("groups", []):
+            if extractor.normalize_code(g["targetCode"]) == code_query:
+                hits.append({"match": "target", "group": g})
+                continue
+            for s in g.get("sources", []):
+                if extractor.normalize_code(s["code"]) == code_query:
+                    hits.append(
+                        {
+                            "match": "source",
+                            "source": s,
+                            "group": g,
+                        }
+                    )
+                    break
+        return hits
+    return []
+
+
+def cmd_codetable(args: argparse.Namespace) -> int:
+    data_dir = _data_dir(args.out_dir)
+    version = _resolve_version(data_dir, args.version)
+    ct = _load_codetable(data_dir, version, args.code_table_id)
+
+    if args.code is not None:
+        code_query = extractor.normalize_code(args.code)
+        hits = _codetable_lookup(ct, code_query)
+        if not hits:
+            sys.exit(
+                f"error: code {args.code!r} not found in {args.code_table_id}.\n"
+                f"hint: try `reseden codetable {args.code_table_id} --limit 5` "
+                f"to inspect available codes, or `reseden search {args.code}`."
+            )
+        _dump(
+            {
+                "version": version,
+                "codeTableId": ct["codeTableId"],
+                "codeTableName": ct["codeTableName"],
+                "kind": ct["kind"],
+                "hits": hits,
+            }
+        )
+        return 0
+
+    # 全件 or --limit
+    payload: dict[str, Any] = {
+        "version": version,
+        "codeTableId": ct["codeTableId"],
+        "codeTableName": ct["codeTableName"],
+        "kind": ct["kind"],
+        "sourcePdf": ct.get("sourcePdf"),
+        "pages": ct.get("pages"),
+    }
+    if ct["kind"] == "codeNamePairs":
+        codes = ct.get("codes", [])
+        truncated = False
+        if args.limit and args.limit > 0 and len(codes) > args.limit:
+            codes = codes[: args.limit]
+            truncated = True
+        payload["rowCount"] = len(ct.get("codes", []))
+        payload["codes"] = codes
+        payload["truncated"] = truncated
+    elif ct["kind"] == "nayoseGroups":
+        groups = ct.get("groups", [])
+        truncated = False
+        if args.limit and args.limit > 0 and len(groups) > args.limit:
+            groups = groups[: args.limit]
+            truncated = True
+        payload["groupCount"] = len(ct.get("groups", []))
+        payload["groups"] = groups
+        payload["truncated"] = truncated
+    else:
+        payload["raw"] = ct  # 未知kindはそのまま
+    _dump(payload)
+    return 0
+
+
+# ---------------------------------------------------------------------------
 # verify
 # ---------------------------------------------------------------------------
 
@@ -502,12 +701,87 @@ def _verify_master(master: dict[str, Any]) -> list[dict[str, Any]]:
     return issues
 
 
+def _verify_codetable(ct: dict[str, Any]) -> list[dict[str, Any]]:
+    issues: list[dict[str, Any]] = []
+    kind = ct.get("kind")
+    if kind == "codeNamePairs":
+        codes = ct.get("codes", [])
+        if not codes:
+            issues.append({"severity": "error", "message": "no codes extracted"})
+            return issues
+        seen: dict[str, int] = {}
+        for i, c in enumerate(codes):
+            code = c.get("code", "")
+            name = c.get("name", "")
+            if not code:
+                issues.append({"severity": "error", "index": i, "message": "empty code"})
+            elif not code.isdigit():
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "index": i,
+                        "code": code,
+                        "message": "non-digit code",
+                    }
+                )
+            if not name:
+                issues.append(
+                    {"severity": "error", "index": i, "code": code, "message": "empty name"}
+                )
+            if code in seen:
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "code": code,
+                        "message": f"duplicate code (also at index {seen[code]})",
+                    }
+                )
+            else:
+                seen[code] = i
+    elif kind == "nayoseGroups":
+        groups = ct.get("groups", [])
+        if not groups:
+            issues.append({"severity": "error", "message": "no groups extracted"})
+            return issues
+        for i, g in enumerate(groups):
+            if not g.get("targetCode"):
+                issues.append(
+                    {"severity": "error", "index": i, "message": "empty targetCode"}
+                )
+            if not g.get("targetName"):
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "index": i,
+                        "targetCode": g.get("targetCode"),
+                        "message": "empty targetName",
+                    }
+                )
+            if not g.get("sources"):
+                issues.append(
+                    {
+                        "severity": "warning",
+                        "index": i,
+                        "targetCode": g.get("targetCode"),
+                        "message": "no sources",
+                    }
+                )
+    else:
+        issues.append({"severity": "warning", "message": f"unknown kind: {kind!r}"})
+    return issues
+
+
 def cmd_verify(args: argparse.Namespace) -> int:
     data_dir = _data_dir(args.out_dir)
     version = _resolve_version(data_dir, args.version)
     baseline_version = _resolve_version(data_dir, args.baseline) if args.baseline else None
     manifest = _load_manifest(data_dir, version)
-    report: dict[str, Any] = {"version": version, "masters": [], "ok": True}
+    report: dict[str, Any] = {
+        "version": version,
+        "masters": [],
+        "codeTables": [],
+        "ok": True,
+    }
     for m in manifest["masters"]:
         master = _load_master(data_dir, version, m["masterId"])
         issues = _verify_master(master)
@@ -545,6 +819,39 @@ def cmd_verify(args: argparse.Namespace) -> int:
             report["ok"] = False
         report["masters"].append(entry)
 
+    # codeTables の検証
+    for ct_meta in manifest.get("codeTables", []):
+        ct = _load_codetable(data_dir, version, ct_meta["codeTableId"])
+        issues = _verify_codetable(ct)
+        entry: dict[str, Any] = {
+            "codeTableId": ct_meta["codeTableId"],
+            "kind": ct_meta.get("kind"),
+            "rowCount": ct_meta.get("rowCount"),
+            "issues": issues,
+        }
+        if baseline_version:
+            baseline_manifest = _load_manifest(data_dir, baseline_version)
+            base_ct = next(
+                (
+                    bc
+                    for bc in baseline_manifest.get("codeTables", [])
+                    if bc["codeTableId"] == ct_meta["codeTableId"]
+                ),
+                None,
+            )
+            if base_ct is None:
+                entry["baselineDiff"] = {"status": "added"}
+            else:
+                diff = (ct_meta.get("rowCount") or 0) - (base_ct.get("rowCount") or 0)
+                entry["baselineDiff"] = {
+                    "status": "changed" if diff else "same",
+                    "rowCountDelta": diff,
+                    "baselineRowCount": base_ct.get("rowCount"),
+                }
+        if any(i["severity"] == "error" for i in issues):
+            report["ok"] = False
+        report["codeTables"].append(entry)
+
     if baseline_version:
         baseline_manifest = _load_manifest(data_dir, baseline_version)
         base_ids = {bm["masterId"] for bm in baseline_manifest["masters"]}
@@ -552,6 +859,12 @@ def cmd_verify(args: argparse.Namespace) -> int:
         report["baseline"] = baseline_version
         report["baselineRemoved"] = sorted(base_ids - cur_ids)
         report["baselineAdded"] = sorted(cur_ids - base_ids)
+        base_ct_ids = {
+            bc["codeTableId"] for bc in baseline_manifest.get("codeTables", [])
+        }
+        cur_ct_ids = {ct["codeTableId"] for ct in manifest.get("codeTables", [])}
+        report["baselineCodeTableRemoved"] = sorted(base_ct_ids - cur_ct_ids)
+        report["baselineCodeTableAdded"] = sorted(cur_ct_ids - base_ct_ids)
 
     _dump(report)
     return 0 if report["ok"] else 1
@@ -562,42 +875,96 @@ def cmd_search(args: argparse.Namespace) -> int:
     version = _resolve_version(data_dir, args.version)
     manifest = _load_manifest(data_dir, version)
     pattern = re.compile(re.escape(args.keyword), re.IGNORECASE)
-    target_ids: list[str] = (
-        [args.master_id] if args.master_id else [m["masterId"] for m in manifest["masters"]]
-    )
+    scope = args.scope or "all"
     results: list[dict[str, Any]] = []
-    for mid in target_ids:
-        master = _load_master(data_dir, version, mid)
-        for f in master["fields"]:
-            name = f.get("name", "") or ""
-            short = f.get("shortName", "") or ""
-            desc = f.get("description", "") or ""
-            # どこでマッチしたか
-            where: list[str] = []
-            if pattern.search(name):
-                where.append("name")
-            if short and pattern.search(short):
-                where.append("shortName")
-            if desc and pattern.search(desc):
-                where.append("description")
-            # codes 内のマッチ
-            code_hits: list[dict[str, str]] = []
-            for c in f.get("codes", []):
-                if pattern.search(c.get("name", "")):
-                    code_hits.append(c)
-            if where or code_hits:
-                hit: dict[str, Any] = {
-                    "masterId": master["masterId"],
-                    "masterName": master["masterName"],
-                    "seq": f["seq"],
-                    "name": name,
-                    "where": where or ["code"],
-                }
-                if "description" in where:
-                    hit["snippet"] = _snippet(desc, args.keyword)
-                if code_hits:
-                    hit["codes"] = code_hits[:5]
-                results.append(hit)
+
+    # masters を対象とした検索
+    if scope in {"all", "master"}:
+        target_ids: list[str] = (
+            [args.master_id]
+            if args.master_id
+            else [m["masterId"] for m in manifest.get("masters", [])]
+        )
+        for mid in target_ids:
+            master = _load_master(data_dir, version, mid)
+            for f in master["fields"]:
+                name = f.get("name", "") or ""
+                short = f.get("shortName", "") or ""
+                desc = f.get("description", "") or ""
+                where: list[str] = []
+                if pattern.search(name):
+                    where.append("name")
+                if short and pattern.search(short):
+                    where.append("shortName")
+                if desc and pattern.search(desc):
+                    where.append("description")
+                code_hits: list[dict[str, str]] = []
+                for c in f.get("codes", []):
+                    if pattern.search(c.get("name", "")):
+                        code_hits.append(c)
+                if where or code_hits:
+                    hit: dict[str, Any] = {
+                        "type": "master",
+                        "masterId": master["masterId"],
+                        "masterName": master["masterName"],
+                        "seq": f["seq"],
+                        "name": name,
+                        "where": where or ["code"],
+                    }
+                    if "description" in where:
+                        hit["snippet"] = _snippet(desc, args.keyword)
+                    if code_hits:
+                        hit["codes"] = code_hits[:5]
+                    results.append(hit)
+
+    # codeTables を対象とした検索
+    if scope in {"all", "codetable"} and not args.master_id:
+        for ct_meta in manifest.get("codeTables", []):
+            ct = _load_codetable(data_dir, version, ct_meta["codeTableId"])
+            kind = ct.get("kind")
+            if kind == "codeNamePairs":
+                for c in ct.get("codes", []):
+                    if pattern.search(c.get("name", "")) or pattern.search(c.get("code", "")):
+                        results.append(
+                            {
+                                "type": "codeTable",
+                                "codeTableId": ct["codeTableId"],
+                                "codeTableName": ct["codeTableName"],
+                                "kind": kind,
+                                "code": c["code"],
+                                "name": c["name"],
+                            }
+                        )
+            elif kind == "nayoseGroups":
+                for g in ct.get("groups", []):
+                    tname = g.get("targetName", "") or ""
+                    note = g.get("note", "") or ""
+                    matched_target = pattern.search(tname) or pattern.search(g.get("targetCode", ""))
+                    matched_note = pattern.search(note)
+                    matched_sources = [
+                        s for s in g.get("sources", [])
+                        if pattern.search(s.get("name", "")) or pattern.search(s.get("code", ""))
+                    ]
+                    if matched_target or matched_note or matched_sources:
+                        hit = {
+                            "type": "codeTable",
+                            "codeTableId": ct["codeTableId"],
+                            "codeTableName": ct["codeTableName"],
+                            "kind": kind,
+                            "targetCode": g.get("targetCode"),
+                            "targetName": g.get("targetName"),
+                            "where": (
+                                (["targetName"] if matched_target else [])
+                                + (["note"] if matched_note else [])
+                                + (["sources"] if matched_sources else [])
+                            ),
+                        }
+                        if matched_sources:
+                            hit["sources"] = matched_sources[:5]
+                        if matched_note:
+                            hit["snippet"] = _snippet(note, args.keyword)
+                        results.append(hit)
+
     limit = args.limit if args.limit and args.limit > 0 else None
     truncated = False
     if limit and len(results) > limit:
@@ -607,6 +974,7 @@ def cmd_search(args: argparse.Namespace) -> int:
         {
             "version": version,
             "keyword": args.keyword,
+            "scope": scope,
             "hitCount": len(results),
             "truncated": truncated,
             "hits": results,
@@ -738,22 +1106,63 @@ def build_parser() -> argparse.ArgumentParser:
     sp = _sub(
         sub,
         "search",
-        help="全マスター横断キーワード検索（name / shortName / description / code.name）",
+        help="master / codeTable 横断キーワード検索",
         description=(
-            "正規表現エスケープした keyword で大小無視検索。hit ごとに where (どこで当たったか)、"
-            "description 由来なら snippet、code.name 由来なら codes 配列を含める。"
+            "正規表現エスケープした keyword で大小無視検索。hit は type=master|codeTable で区別。"
+            "master側は name/shortName/description/code.name を、"
+            "codeTable側は code/name/(nayoseの)targetName/note/sources をスキャン。"
         ),
         epilog=(
             "example:\n"
             "  reseden search 後発品\n"
-            "  reseden search 加算 --master-id ika_shinryoukoui --limit 10"
+            "  reseden search 加算 --master-id ika_shinryoukoui --limit 10\n"
+            "  reseden search 緩和ケア --scope codetable"
         ),
     )
     sp.add_argument("keyword", metavar="<keyword>")
-    sp.add_argument("--master-id", dest="master_id", metavar="<masterId>", help="検索対象を1マスターに絞る")
+    sp.add_argument("--master-id", dest="master_id", metavar="<masterId>", help="検索対象を1マスターに絞る (この場合 codeTable は対象外)")
+    sp.add_argument(
+        "--scope",
+        choices=["all", "master", "codetable"],
+        default="all",
+        help="検索対象 (デフォルト: all)",
+    )
     sp.add_argument("--limit", type=int, metavar="N", help="hit を N 件で打ち切る")
     sp.add_argument("--version", metavar="YYYYMMDD")
     sp.set_defaults(func=cmd_search)
+
+    sp = _sub(
+        sub,
+        "codetables",
+        help="別紙PDF由来のコード表一覧",
+        description="指定版にある codeTable 一覧を返す。施設基準コード一覧などのフラットコード表。",
+        epilog="example:\n  reseden codetables",
+    )
+    sp.add_argument("--version", metavar="YYYYMMDD")
+    sp.set_defaults(func=cmd_codetables)
+
+    sp = _sub(
+        sub,
+        "codetable",
+        help="コード表の全件 or 1コードの逆引き",
+        description=(
+            "1引数 (codeTableId) で全件 dump、2引数 (codeTableId, code) で逆引き。"
+            "kind=codeNamePairs はそのまま、kind=nayoseGroups は target/source 両方向で検索。"
+        ),
+        epilog=(
+            "example:\n"
+            "  reseden codetables                            # 一覧\n"
+            "  reseden codetable shisetsu_kijun --limit 5\n"
+            "  reseden codetable shisetsu_kijun 209          # コード逆引き\n"
+            "  reseden codetable nayose 849                  # 名寄せ先 849 のグループ\n"
+            "  reseden codetable nayose 730                  # 名寄せ元 730 が属するグループ"
+        ),
+    )
+    sp.add_argument("code_table_id", metavar="<codeTableId>")
+    sp.add_argument("code", nargs="?", metavar="<code>", help="指定すると逆引き")
+    sp.add_argument("--limit", type=int, metavar="N", help="全件dump時にN件で切る")
+    sp.add_argument("--version", metavar="YYYYMMDD")
+    sp.set_defaults(func=cmd_codetable)
 
     sp = _sub(
         sub,
@@ -795,6 +1204,11 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("url")
     sp.add_argument("--force", action="store_true", help="キャッシュがあっても再ダウンロード")
     sp.add_argument("--version", metavar="YYYYMMDD", help="推定された版を上書き")
+    sp.add_argument(
+        "--kind",
+        choices=["master", "appendix"],
+        help="PDF種別 (master_0/1=master, master_2=appendix)。省略時はファイル名で自動判別",
+    )
     sp.set_defaults(func=cmd_fetch)
 
     return p

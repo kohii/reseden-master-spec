@@ -1,20 +1,30 @@
 # reseden-master-spec
 
-診療報酬制度の「レセプト電算処理システム マスターファイル仕様書」PDFを、
+診療報酬制度の「レセプト電算処理システム マスターファイル仕様書」と、
+そこから参照される **別紙（補助コード表）** の PDF を、
 コーディングエージェント（LLM）や周辺ツールが扱いやすい構造化JSONに変換するツール。
 
 PDF（[社会保険診療報酬支払基金 公開資料][ssk]）はページ表形式で配布されており、
 そのままではコードからの参照やLLMへの参照入力が難しい。本ツールは、
 
+- 2系統のPDFを扱う:
+  - **基本マスター仕様書** (`master_0/1_*.pdf`) → `master`（項目仕様）
+  - **別紙** (`master_2_*.pdf`) → `codeTable`（施設基準コード一覧／名寄せコード一覧）
 - PDF URL を指定するだけで **ダウンロード → 表抽出 → JSON化** を自動化する
 - 改定（版）毎にディレクトリを分けて **バージョン管理** できる
-- CLI から **マスター一覧・項目定義・コード値検索** ができる
+- CLI から **マスター一覧・項目定義・コード値検索・施設基準コード逆引き** ができる
 
-ことで、仕様書を一次情報として扱いやすくする。
+ことで、仕様書・補助表を一次情報として扱いやすくする。
 
 [ssk]: https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/
 
 ## 出力スキーマ
+
+`data/<version>/` 配下に、master と codeTable がそれぞれ独立した JSON ファイルとして並ぶ。
+`manifest.json` がその版に含まれる全リソースの索引で、複数の source PDF
+（master_0_* と master_2_*）に分かれた由来も `sources[]` で追跡する。
+
+### master (基本マスター仕様書由来)
 
 1マスター = 1JSONファイル。10種以上のマスター（歯科診療行為のサブテーブルを含めると18〜19）が
 それぞれ `data/<version>/<master_id>.json` に出力される。
@@ -24,7 +34,7 @@ PDF（[社会保険診療報酬支払基金 公開資料][ssk]）はページ表
   "masterId": "iyakuhin",
   "masterName": "医薬品マスター",
   "subName": null,
-  "version": "20260331",
+  "version": "20260501",
   "pages": { "start": 20, "end": 23 },
   "fields": [
     {
@@ -36,11 +46,53 @@ PDF（[社会保険診療報酬支払基金 公開資料][ssk]）はページ表
       "description": "...",
       "codes": [
         { "code": "0", "name": "「１」から「５」以外の医薬品" },
-        { "code": "1", "name": "麻薬" },
-        { "code": "2", "name": "毒薬" },
-        { "code": "3", "name": "覚醒剤原料" },
-        { "code": "5", "name": "向精神薬" }
+        { "code": "3", "name": "覚醒剤原料" }
       ]
+    }
+  ]
+}
+```
+
+### codeTable (別紙由来の補助コード表)
+
+`master_2_*.pdf` から抽出した独立した辞書テーブル。`kind` でレコード形式を区別する。
+
+- `kind=codeNamePairs` … 2列の (code, name) フラットリスト
+  - `shisetsu_kijun.json` (施設基準コード一覧、約2000件)
+- `kind=nayoseGroups` … 名寄せ先1件 + 名寄せ元複数件 + 備考 のグループ
+  - `nayose.json` (名寄せコード一覧)
+
+```json
+{
+  "codeTableId": "shisetsu_kijun",
+  "codeTableName": "施設基準コード一覧",
+  "kind": "codeNamePairs",
+  "version": "20260501",
+  "sourcePdf": "master_2_20260501.pdf",
+  "pages": [{ "start": 31, "end": 70 }, { "start": 126, "end": 127 }],
+  "codes": [
+    { "code": "209", "name": "特殊疾患入院医療管理料" },
+    { "code": "224", "name": "緩和ケア診療加算" }
+  ]
+}
+```
+
+```json
+{
+  "codeTableId": "nayose",
+  "codeTableName": "名寄せコード一覧",
+  "kind": "nayoseGroups",
+  "version": "20260501",
+  "sourcePdf": "master_2_20260501.pdf",
+  "pages": [{ "start": 71, "end": 80 }],
+  "groups": [
+    {
+      "targetCode": "849",
+      "targetName": "リハビリテーション総合計画評価料１",
+      "sources": [
+        { "code": "730", "name": "心大血管疾患リハビリテーション料（Ⅰ）" }
+      ],
+      "note": "【医科点数表】「Ｈ００３－２リハビリテーション総合計画評価料」の注１の規定に基づき設定"
     }
   ]
 }
@@ -51,14 +103,18 @@ PDF（[社会保険診療報酬支払基金 公開資料][ssk]）はページ表
 ```
 reseden-master-spec/
 ├── src/reseden_master_spec/
-│   ├── extract.py         # PDF → JSON 変換エンジン
-│   ├── cli.py             # CLI エントリポイント（reseden コマンド）
-│   └── text_supplement.py # pdftotext ベースのハイブリッド補完
+│   ├── extract.py          # 基本マスター仕様書PDF → JSON 変換エンジン
+│   ├── extract_appendix.py # 別紙PDF → codeTable JSON 変換エンジン
+│   ├── manifest_io.py      # manifest.json の読み書き・migrate
+│   ├── cli.py              # CLI エントリポイント（reseden コマンド）
+│   └── text_supplement.py  # pdftotext ベースのハイブリッド補完
 ├── data/
-│   ├── raw/               # ダウンロード済みPDF (キャッシュ、非配布)
-│   └── <YYYYMMDD>/        # 抽出結果（バージョン別）
+│   ├── raw/                # ダウンロード済みPDF (キャッシュ、非配布)
+│   └── <YYYYMMDD>/         # 適用日（master_0/2 共通）ごとのスナップショット
 │       ├── manifest.json
-│       ├── <master>.json
+│       ├── <master>.json   # master_0_* 由来
+│       ├── shisetsu_kijun.json  # master_2_* 由来
+│       ├── nayose.json          # master_2_* 由来
 │       └── sections.debug.json
 ├── pyproject.toml
 └── uv.lock
@@ -84,14 +140,19 @@ uv tool update-shell
 ### よく使うコマンド
 
 ```bash
-reseden info                      # 同梱データ版・マスター一覧・主要コマンドガイド
-reseden masters                   # 全マスター（masterId と fieldCount）
-reseden fields iyakuhin --summary # seq/name/mode/maxBytes/hasCodes の簡略版
-reseden field iyakuhin 14         # 項番14 の詳細（codes 含む）
-reseden code iyakuhin 14 3        # 項番14 のコード値 "3" を引く
-reseden search 後発品 --limit 10   # キーワード検索（どこでヒットしたか + snippet 付）
-reseden schema                    # 出力 JSON のスキーマ概要
-reseden verify                    # 抽出結果の健全性チェック（exit 0=OK / 1=error）
+reseden info                          # 同梱データ版・master/codeTable 一覧・主要コマンドガイド
+reseden masters                       # 全マスター（masterId と fieldCount）
+reseden codetables                    # 全 codeTable（codeTableId と rowCount）
+reseden fields iyakuhin --summary     # seq/name/mode/maxBytes/hasCodes の簡略版
+reseden field iyakuhin 14             # 項番14 の詳細（codes 含む）
+reseden code iyakuhin 14 3            # マスターの 項番14 のコード値 "3" を引く
+reseden codetable shisetsu_kijun 209  # 別紙の施設基準コード "209" を引く
+reseden codetable nayose 849          # 名寄せ先 "849" のグループ全体
+reseden codetable nayose 730          # 名寄せ元 "730" が属するグループ
+reseden search 後発品 --limit 10        # master/codeTable 横断のキーワード検索
+reseden search 緩和ケア --scope codetable  # codeTable のみに絞って検索
+reseden schema                        # 出力 JSON のスキーマ概要
+reseden verify                        # 抽出結果の健全性チェック（exit 0=OK / 1=error）
 ```
 
 各サブコマンドの詳細と使用例は `reseden <cmd> --help`。
@@ -158,11 +219,19 @@ uv sync
 ### PDF取得＋抽出
 
 ```bash
+# 基本マスター仕様書（master_0_* / master_1_*）
 uv run reseden fetch \
-  https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/index.files/master_1_20260331.pdf
+  https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/r08kaiteijoho.files/master_0_20260501.pdf
+
+# 別紙（master_2_*）
+uv run reseden fetch \
+  https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/index.files/master_2_20260501.pdf
 ```
 
-- PDFファイル名の末尾 `YYYYMMDD` からバージョンを推定して `data/<version>/` に出力する。
+- PDFファイル名の末尾 `YYYYMMDD` からバージョン（適用日）を推定して `data/<version>/` に出力する。
+- `master_0/1` か `master_2` かはファイル名から自動判別（`--kind master|appendix` で上書き可）。
+- 同一 `data/<version>/` に master と appendix の両方が同居する設計。
+- master_0 と master_2 で適用日がずれる場合、新しい版をフェッチすると **直近版から欠けてる方をコピー** して新しい dir を完成させる（1ディレクトリ=1スナップショット原則）。
 - 既にダウンロード済みの場合はキャッシュ (`data/raw/`) を使う。再取得したい場合は `--force`。
 
 ### ローカルで CLI を叩く
@@ -180,6 +249,8 @@ uv run reseden search 後発品
 
 ## 抽出マスター一覧
 
+### master (`master_0_*.pdf` 由来)
+
 | master_id | マスター名 |
 | --- | --- |
 | `shoubyomei` | 傷病名マスター（旧傷病名管理ファイル） |
@@ -194,6 +265,13 @@ uv run reseden search 後発品
 | `chouzai_koui` | 調剤行為マスター |
 | `houmon_kango` | 訪問看護療養費マスター (基本テーブル) |
 | `houmon_kango_イ` 〜 `_オ` | 訪問看護療養費マスターのサブテーブル |
+
+### codeTable (`master_2_*.pdf` 由来)
+
+| codeTableId | 内容 | kind |
+| --- | --- | --- |
+| `shisetsu_kijun` | 施設基準コード一覧（コード ↔ 施設基準名のフラット辞書、約2000件） | `codeNamePairs` |
+| `nayose` | 名寄せコード一覧（複数の施設基準コードを1つの名寄せ先コードに集約） | `nayoseGroups` |
 
 ## バージョン管理方針
 
