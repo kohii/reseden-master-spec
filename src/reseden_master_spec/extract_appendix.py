@@ -75,21 +75,73 @@ class PageKind:
     kind: str  # 'shisetsu' | 'nayose' | 'other'
 
 
+# 施設基準系のページ判定:
+#  - 表ヘッダ '施設基準コード 施設基準' がページ先頭行に来る (本文中盤のページ)
+#  - タイトル '施設基準コード一覧' / '施設基準コード表' がページ冒頭付近にある (見出しページ)
 _SHISETSU_HEADER_RE = re.compile(r"^施設基準コード\s+施設基準")
+_SHISETSU_TITLE_RE = re.compile(r"施設基準コード(?:一覧|表)")
 _NAYOSE_BODY_HEAD_RE = re.compile(r"^名寄せ先\s+名寄せ元")
 _NAYOSE_TITLE_RE = re.compile(r"名寄せコード一覧")
+# 「別紙N－M」「別紙N」のラベル。N(M)は全角/半角どちらも可。
+_APPENDIX_LABEL_RE = re.compile(r"別紙[\d０-９]+(?:[－-][\d０-９]+)?")
+
+
+def _normalize_appendix_label(label: str) -> str:
+    """別紙ラベル中の数字を半角化して比較を容易にする。"""
+    return label.translate(_DIGIT_TRANS).replace("－", "-")
+
+
+def _detect_appendix_label(text: str) -> str:
+    """ページ冒頭付近にある『別紙Ｎ－Ｍ』ラベルを返す。なければ空文字。"""
+    m = _APPENDIX_LABEL_RE.search(text[:300])
+    return _normalize_appendix_label(m.group(0)) if m else ""
+
+
+# 別紙ラベルごとの施設基準コード系列の codeTable id 振り分け。
+#   別紙７－N (p.30-70): 医科・歯科系          → shisetsu_kijun
+#   別紙９－N (p.116):   調剤系                → shisetsu_kijun_chouzai
+#   別紙１０-N (p.125):  訪問看護療養費系      → shisetsu_kijun_houmon_kango
+_SHISETSU_KIND_BY_APPENDIX_PREFIX: list[tuple[str, str]] = [
+    ("別紙10", "shisetsu_houmon_kango"),
+    ("別紙9", "shisetsu_chouzai"),
+]
+
+
+def _shisetsu_kind_for(appendix_label: str) -> str:
+    for prefix, kind in _SHISETSU_KIND_BY_APPENDIX_PREFIX:
+        if appendix_label.startswith(prefix):
+            return kind
+    return "shisetsu"
 
 
 def classify_pages(pdf: pdfplumber.PDF) -> list[PageKind]:
+    """各ページを kind に分類する。
+
+    kind は以下のいずれか:
+      - 'shisetsu'              : 別紙７－８ 医科・歯科系 施設基準コード一覧
+      - 'shisetsu_chouzai'      : 別紙９－４ 調剤系 施設基準コード表
+      - 'shisetsu_houmon_kango' : 別紙１０－５ 訪問看護療養費系 施設基準コード一覧
+      - 'nayose'                : 別紙７－８ 名寄せコード一覧
+      - 'other'                 : 構造化対象外
+
+    ページ冒頭の『別紙Ｎ－Ｍ』ラベルで業種系列を切り替える。ラベルが無い続きページは
+    直前ラベルを維持する。
+    """
     out: list[PageKind] = []
+    cur_label = ""
     for i, page in enumerate(pdf.pages):
         text = page.extract_text() or ""
+        label = _detect_appendix_label(text)
+        if label:
+            cur_label = label
         first = next((ln.strip() for ln in text.split("\n") if ln.strip()), "")
-        kind = "other"
-        if _SHISETSU_HEADER_RE.match(first):
-            kind = "shisetsu"
-        elif _NAYOSE_BODY_HEAD_RE.match(first) or _NAYOSE_TITLE_RE.search(text[:300]):
+        head = text[:400]
+        if _NAYOSE_BODY_HEAD_RE.match(first) or _NAYOSE_TITLE_RE.search(head):
             kind = "nayose"
+        elif _SHISETSU_HEADER_RE.match(first) or _SHISETSU_TITLE_RE.search(head):
+            kind = _shisetsu_kind_for(cur_label)
+        else:
+            kind = "other"
         out.append(PageKind(page_no=i + 1, kind=kind))
     return out
 
@@ -166,6 +218,34 @@ def _detect_logical_columns(rows: list[list[str | None]], n: int) -> list[int] |
 # ---------------------------------------------------------------------------
 
 
+def _row_to_code_name(row: list[str | None]) -> tuple[str, str] | None:
+    """1 データ行から (code, name) を動的に抽出する。
+
+    行ごとに列配置がずれるテーブル（例: p.125 で 902 と 923-926 で code/name が
+    異なる列に入る）にも追随できるよう、固定列ではなく行内のセル並びから
+    『最初に出現する数字セル = code, その右の最初の非空セル = name』として読む。
+    """
+    code = ""
+    code_idx = -1
+    for i, cell in enumerate(row):
+        norm = _normalize_code(cell)
+        if norm and norm.isdigit():
+            code = norm
+            code_idx = i
+            break
+    if code_idx < 0:
+        return None
+    name = ""
+    for j in range(code_idx + 1, len(row)):
+        text = _cell_text(row[j])
+        if text:
+            name = text
+            break
+    if not name:
+        return None
+    return code, name
+
+
 def extract_shisetsu_kijun(
     pdf: pdfplumber.PDF, page_ranges: list[tuple[int, int]]
 ) -> tuple[list[dict[str, str]], list[dict[str, int]]]:
@@ -182,18 +262,11 @@ def extract_shisetsu_kijun(
             for table in page.extract_tables() or []:
                 if not table:
                     continue
-                data = _data_rows(table)
-                cols = _detect_logical_columns(data, 2)
-                if cols is None:
-                    continue
-                code_col, name_col = cols
-                for row in data:
-                    code_raw = row[code_col] if code_col < len(row) else None
-                    name_raw = row[name_col] if name_col < len(row) else None
-                    code = _normalize_code(code_raw)
-                    name = _cell_text(name_raw)
-                    if not code or not code.isdigit() or not name:
+                for row in _data_rows(table):
+                    pair = _row_to_code_name(row)
+                    if pair is None:
                         continue
+                    code, name = pair
                     if code in seen:
                         continue
                     seen.add(code)
@@ -475,26 +548,39 @@ class CodeTableArtifact:
     payload: dict[str, Any]  # JSONに保存する本体
 
 
+_SHISETSU_TABLE_SPECS: list[tuple[str, str, str]] = [
+    # (kind, code_table_id, code_table_name)
+    ("shisetsu", "shisetsu_kijun", "施設基準コード一覧（医科・歯科）"),
+    ("shisetsu_chouzai", "shisetsu_kijun_chouzai", "施設基準コード表（調剤）"),
+    (
+        "shisetsu_houmon_kango",
+        "shisetsu_kijun_houmon_kango",
+        "施設基準コード一覧（訪問看護療養費）",
+    ),
+]
+
+
 def extract_all(pdf: pdfplumber.PDF) -> list[CodeTableArtifact]:
     """別紙PDFから抽出できる code tables を全て返す"""
     kinds = classify_pages(pdf)
-    shisetsu_ranges = _group_consecutive(kinds, "shisetsu")
-    nayose_ranges = _group_consecutive(kinds, "nayose")
-
     artifacts: list[CodeTableArtifact] = []
 
-    if shisetsu_ranges:
-        codes, used = extract_shisetsu_kijun(pdf, shisetsu_ranges)
+    for kind, table_id, table_name in _SHISETSU_TABLE_SPECS:
+        ranges = _group_consecutive(kinds, kind)
+        if not ranges:
+            continue
+        codes, used = extract_shisetsu_kijun(pdf, ranges)
         artifacts.append(
             CodeTableArtifact(
-                code_table_id="shisetsu_kijun",
-                code_table_name="施設基準コード一覧",
+                code_table_id=table_id,
+                code_table_name=table_name,
                 kind="codeNamePairs",
                 pages=used,
                 payload={"codes": codes, "rowCount": len(codes)},
             )
         )
 
+    nayose_ranges = _group_consecutive(kinds, "nayose")
     if nayose_ranges:
         all_groups: list[dict[str, Any]] = []
         used_ranges: list[dict[str, int]] = []

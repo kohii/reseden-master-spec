@@ -67,7 +67,8 @@ description: 診療報酬制度「レセプト電算処理システム 基本マ
 - 「マスター内のあるコード値が何を意味するか」:
   `reseden code <masterId> <seq> <code>`。コード一覧が不明なら先に `reseden field` でその項目を見る。
 - 「施設基準コードから名称を引きたい」:
-  `reseden codetable shisetsu_kijun <code>`。コード一覧が不明なら `reseden codetable shisetsu_kijun --limit 20`。
+  業種ごとに codeTable が分かれている (`shisetsu_kijun` = 医科・歯科 / `shisetsu_kijun_chouzai` = 調剤 / `shisetsu_kijun_houmon_kango` = 訪問看護療養費)。
+  どこにあるか分からない時は `reseden search <code> --scope codetable` で全 codeTable 横断検索。
 - 「ある施設基準コードが名寄せ対象か知りたい」:
   `reseden codetable nayose <code>`。`match: source` が返れば名寄せ元、`match: target` なら名寄せ先。
 - 「キーワードで関連項目を探したい」:

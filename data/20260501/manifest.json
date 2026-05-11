@@ -1,7 +1,7 @@
 {
   "version": "20260501",
   "extractorVersion": "0.1.0",
-  "extractedAt": "2026-05-11T03:20:58Z",
+  "extractedAt": "2026-05-11T04:38:38Z",
   "dependencies": {
     "pdfplumber": "0.11.9",
     "pdftotext": "pdftotext version 26.02.0"
@@ -268,7 +268,7 @@
       "sourceUrl": "https://www.ssk.or.jp/seikyushiharai/tensuhyo/kihonmasta/index.files/master_2_20260501.pdf",
       "sourceSha256": "8e6fc41270394966511cc105142b0556ca7ebce40bd223102d39f110a9c28555",
       "sourceVersion": "20260501",
-      "extractedAt": "2026-05-11T03:20:58Z"
+      "extractedAt": "2026-05-11T04:38:38Z"
     },
     {
       "kind": "master",
@@ -282,20 +282,44 @@
   "codeTables": [
     {
       "codeTableId": "shisetsu_kijun",
-      "codeTableName": "施設基準コード一覧",
+      "codeTableName": "施設基準コード一覧（医科・歯科）",
       "kind": "codeNamePairs",
       "pages": [
         {
-          "start": 31,
+          "start": 30,
           "end": 70
-        },
-        {
-          "start": 126,
-          "end": 127
         }
       ],
       "file": "shisetsu_kijun.json",
-      "rowCount": 1971,
+      "rowCount": 1944,
+      "sourcePdf": "master_2_20260501.pdf"
+    },
+    {
+      "codeTableId": "shisetsu_kijun_chouzai",
+      "codeTableName": "施設基準コード表（調剤）",
+      "kind": "codeNamePairs",
+      "pages": [
+        {
+          "start": 116,
+          "end": 116
+        }
+      ],
+      "file": "shisetsu_kijun_chouzai.json",
+      "rowCount": 33,
+      "sourcePdf": "master_2_20260501.pdf"
+    },
+    {
+      "codeTableId": "shisetsu_kijun_houmon_kango",
+      "codeTableName": "施設基準コード一覧（訪問看護療養費）",
+      "kind": "codeNamePairs",
+      "pages": [
+        {
+          "start": 125,
+          "end": 127
+        }
+      ],
+      "file": "shisetsu_kijun_houmon_kango.json",
+      "rowCount": 100,
       "sourcePdf": "master_2_20260501.pdf"
     },
     {

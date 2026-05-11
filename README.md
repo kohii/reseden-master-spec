@@ -56,23 +56,27 @@ PDF（[社会保険診療報酬支払基金 公開資料][ssk]）はページ表
 ### codeTable (別紙由来の補助コード表)
 
 `master_2_*.pdf` から抽出した独立した辞書テーブル。`kind` でレコード形式を区別する。
+施設基準コードは業種ごとに別系列で番号体系が独立しているため、それぞれ別 codeTable
+として収録する。
 
 - `kind=codeNamePairs` … 2列の (code, name) フラットリスト
-  - `shisetsu_kijun.json` (施設基準コード一覧、約2000件)
+  - `shisetsu_kijun.json` (別紙７－８ 施設基準コード一覧・医科/歯科系、約 1900 件)
+  - `shisetsu_kijun_chouzai.json` (別紙９－４ 施設基準コード表・調剤系)
+  - `shisetsu_kijun_houmon_kango.json` (別紙１０－５ 施設基準コード一覧・訪問看護療養費系)
 - `kind=nayoseGroups` … 名寄せ先1件 + 名寄せ元複数件 + 備考 のグループ
-  - `nayose.json` (名寄せコード一覧)
+  - `nayose.json` (別紙７－８ 名寄せコード一覧)
 
 ```json
 {
   "codeTableId": "shisetsu_kijun",
-  "codeTableName": "施設基準コード一覧",
+  "codeTableName": "施設基準コード一覧（医科・歯科）",
   "kind": "codeNamePairs",
   "version": "20260501",
   "sourcePdf": "master_2_20260501.pdf",
-  "pages": [{ "start": 31, "end": 70 }, { "start": 126, "end": 127 }],
+  "pages": [{ "start": 30, "end": 70 }],
   "codes": [
-    { "code": "209", "name": "特殊疾患入院医療管理料" },
-    { "code": "224", "name": "緩和ケア診療加算" }
+    { "code": "3", "name": "特定機能病院" },
+    { "code": "209", "name": "特殊疾患入院医療管理料" }
   ]
 }
 ```
@@ -112,9 +116,11 @@ reseden-master-spec/
 │   ├── raw/                # ダウンロード済みPDF (キャッシュ、非配布)
 │   └── <YYYYMMDD>/         # 適用日（master_0/2 共通）ごとのスナップショット
 │       ├── manifest.json
-│       ├── <master>.json   # master_0_* 由来
-│       ├── shisetsu_kijun.json  # master_2_* 由来
-│       ├── nayose.json          # master_2_* 由来
+│       ├── <master>.json                       # master_0_* 由来
+│       ├── shisetsu_kijun.json                  # master_2_* 由来 (医科・歯科)
+│       ├── shisetsu_kijun_chouzai.json          # master_2_* 由来 (調剤)
+│       ├── shisetsu_kijun_houmon_kango.json     # master_2_* 由来 (訪問看護療養費)
+│       ├── nayose.json                          # master_2_* 由来
 │       └── sections.debug.json
 ├── pyproject.toml
 └── uv.lock
@@ -270,7 +276,9 @@ uv run reseden search 後発品
 
 | codeTableId | 内容 | kind |
 | --- | --- | --- |
-| `shisetsu_kijun` | 施設基準コード一覧（コード ↔ 施設基準名のフラット辞書、約2000件） | `codeNamePairs` |
+| `shisetsu_kijun` | 施設基準コード一覧（医科・歯科系、別紙７－８） | `codeNamePairs` |
+| `shisetsu_kijun_chouzai` | 施設基準コード表（調剤系、別紙９－４） | `codeNamePairs` |
+| `shisetsu_kijun_houmon_kango` | 施設基準コード一覧（訪問看護療養費系、別紙１０－５） | `codeNamePairs` |
 | `nayose` | 名寄せコード一覧（複数の施設基準コードを1つの名寄せ先コードに集約） | `nayoseGroups` |
 
 ## バージョン管理方針
