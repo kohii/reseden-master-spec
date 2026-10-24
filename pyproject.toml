@@ -7,7 +7,7 @@ readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "kohii" }]
 dependencies = [
-    "pdfplumber>=0.11.9",
+    "pdfplumber>=0.11.10",
 ]
 
 [project.urls]
